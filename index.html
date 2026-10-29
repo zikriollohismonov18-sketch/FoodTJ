@@ -10,9 +10,36 @@
 :root{--bg:#f4f6fa;--panel:#fff;--ink:#172033;--muted:#697386;--line:#e3e8f0;--green:#16a34a;--dark:#111827;--red:#dc2626;--orange:#f97316}
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}button,input,textarea,select{font:inherit}button{border:0;border-radius:10px;padding:11px 15px;background:var(--green);color:#fff;font-weight:700;cursor:pointer}button.secondary{background:#e8edf5;color:var(--ink)}button.danger{background:var(--red)}button:disabled{opacity:.55;cursor:not-allowed}.top{background:var(--dark);color:white;padding:16px 4%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.brand{font-size:24px;font-weight:900;letter-spacing:-.6px}.brand span{color:#4ade80}.top small{color:#cbd5e1}.top-actions{display:flex;gap:8px;flex-wrap:wrap}.top-actions button.secondary{background:#273449;color:white}.wrap{max-width:1150px;margin:0 auto;padding:22px 16px 60px}.hero{background:linear-gradient(120deg,#052e16,#166534);color:white;border-radius:20px;padding:28px;margin-bottom:22px;display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:center}.hero h1{font-size:clamp(28px,5vw,44px);line-height:1.1;margin:0 0 12px}.hero p{color:#dcfce7;line-height:1.6;margin:0}.hero .emoji{font-size:76px;text-align:center}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 18px}.toolbar input{flex:1;min-width:190px}.field, input,textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:white;color:var(--ink)}textarea{min-height:80px;resize:vertical}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:15px}.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:0 4px 14px #0f172a08}.card h3{margin:0 0 7px}.muted{color:var(--muted);font-size:14px}.pill{display:inline-block;background:#dcfce7;color:#166534;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:700}.pill.gray{background:#edf0f5;color:#475569}.section{margin-top:25px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.section h2{font-size:22px;margin:0 0 12px}.hidden{display:none!important}.stack{display:grid;gap:10px}.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.row>*{flex:1}.row button{flex:0 0 auto}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.formgrid .full{grid-column:1/-1}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.tabs button{background:#e8edf5;color:#334155}.tabs button.active{background:var(--dark);color:white}.notice{padding:12px 14px;border-radius:10px;background:#eff6ff;color:#1e40af;margin:12px 0;white-space:pre-wrap}.notice.error{background:#fef2f2;color:#991b1b}.notice.success{background:#f0fdf4;color:#166534}.item{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:12px 0}.item:last-child{border-bottom:0}.price{font-weight:800;white-space:nowrap}.cartbar{position:sticky;bottom:12px;background:#111827;color:white;border-radius:14px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;box-shadow:0 8px 24px #0002}.cartbar small{color:#cbd5e1}.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:32px}.status{font-weight:700;color:#166534}.empty{padding:28px;text-align:center;color:var(--muted);background:white;border:1px dashed #cbd5e1;border-radius:14px}.small{font-size:12px}.order-card{margin-bottom:12px}.menu-actions{display:flex;gap:8px;align-items:center}.menu-actions input{width:70px;flex:0 0 70px}.danger-text{color:#b91c1c}a{color:var(--green);font-weight:700;text-decoration:none}a:hover{text-decoration:underline}
 @media(max-width:650px){.hero{grid-template-columns:1fr;padding:22px}.hero .emoji{display:none}.formgrid{grid-template-columns:1fr}.top{padding:14px}.wrap{padding:16px 12px 45px}.cartbar{align-items:flex-start;flex-direction:column}.top-actions{width:100%}.top-actions button{flex:1}}
+
+/* ===== FoodTJ dashboard refresh: inspired by the supplied reference ===== */
+:root{--bg:#f4f7fc;--panel:#fff;--ink:#111c2f;--muted:#61718b;--line:#e6edf6;--green:#16a34a;--dark:#111b2b;--red:#ef4444;--orange:#ff7626}
+body{background:#f4f7fc;color:var(--ink)}
+.top{position:relative;margin-left:272px;min-height:70px;padding:14px 28px;background:#1c2737;border-bottom:1px solid #273447;box-shadow:0 4px 20px #1420330a}
+.top>div:first-child{display:flex;align-items:center;gap:14px}.brand{font-size:26px;letter-spacing:-.7px}.brand:before{content:'👨‍🍳';display:inline-flex;align-items:center;justify-content:center;margin-right:9px;font-size:27px}.brand span{color:#ff7626}.top small{color:#c9d4e3;font-size:14px}.top-actions button.secondary{background:#27364a;border:1px solid #3a4960;color:#eef4ff}
+.foodtj-sidebar{position:fixed;z-index:20;inset:0 auto 0 0;width:272px;background:linear-gradient(180deg,#151f2e,#101927);color:#d8e1ee;display:flex;flex-direction:column;padding:0 14px 18px;border-right:1px solid #263347;overflow-y:auto}
+.foodtj-side-brand{height:82px;display:flex;align-items:center;padding:0 18px;border-bottom:1px solid #29364a;margin:0 -14px 18px;font-size:28px;font-weight:900;color:#fff;letter-spacing:-.8px}.foodtj-side-brand span{color:#ff7626}.foodtj-nav{display:grid;gap:7px}.foodtj-nav a{display:flex;align-items:center;gap:14px;padding:14px 15px;border-radius:12px;color:#cbd6e5;text-decoration:none;font-weight:650;transition:.18s}.foodtj-nav a:hover{background:#26354a;color:#fff;text-decoration:none}.foodtj-nav a.active{background:#ff7626;color:white;box-shadow:0 7px 18px #ff762633}.foodtj-nav .nav-ico{width:22px;text-align:center;font-size:20px}.foodtj-side-bottom{margin-top:auto;border:1px solid #314057;border-radius:14px;padding:16px;margin-top:35px;background:#172334}.foodtj-side-bottom strong{display:block;color:#fff;font-size:18px;margin-bottom:7px}.foodtj-side-bottom p{font-size:12px;line-height:1.6;color:#c3cfdf;margin:0}.foodtj-side-bottom .copyright{margin-top:22px;color:#8795a9;font-size:11px}
+.wrap{max-width:none;margin:0 0 0 272px;padding:28px 26px 55px}.hero{background:linear-gradient(120deg,#ff7626,#ff8b36);border-radius:18px;padding:26px 30px;box-shadow:0 10px 25px #ff76261a}.hero p{color:#fff4eb}.hero .emoji{font-size:65px}.section{margin-top:25px}.section-head h2{font-size:26px;letter-spacing:-.5px}.card{border:1px solid #e8eef6;border-radius:15px;box-shadow:0 4px 18px #1d35570a;padding:17px}.grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}.toolbar input,.toolbar select,.field{border-color:#e0e8f3;border-radius:11px;min-height:46px}.toolbar button,button{background:#ff7626;border-radius:10px;box-shadow:none}button:hover{filter:brightness(.97)}button.secondary{background:#eff3f9;color:#40536f}.tabs button.active{background:#ff7626}.pill{background:#dcfce9;color:#168044}.pill.gray{background:#eaf0f8;color:#51627e}.notice{border-radius:12px}.empty{border-radius:14px;background:#fff;border-color:#d7e1ee}.footer{margin-top:35px}
+#foodCatalogSection .section-head{align-items:center;margin-bottom:7px}#foodCatalogSection .section-head h2{margin:0}#foodCatalogSection>p.muted{margin:6px 0 18px}#foodCatalogSection .toolbar{display:grid;grid-template-columns:minmax(200px,1fr) minmax(180px,230px) auto;gap:12px;margin:18px 0 20px}#foodCatalogGrid .card{padding:9px 9px 13px;overflow:hidden;min-width:0}#foodCatalogGrid .card img,#foodCatalogGrid .food-photo{width:100%;height:130px;object-fit:cover;border-radius:10px;display:block;background:#f0f3f8}#foodCatalogGrid .food-photo{display:flex;align-items:center;justify-content:center;font-size:54px;background:linear-gradient(135deg,#fff0e5,#f5f7fb)}#foodCatalogGrid .pill{display:inline-block;margin:10px 7px 5px;padding:4px 9px;font-size:11px;background:#ffedcf;color:#8b4b00}#foodCatalogGrid h3{margin:5px 7px;font-size:16px}#foodCatalogGrid .muted{margin:5px 7px}#foodCatalogGrid .price{margin:8px 7px;color:#ff7626;font-size:15px}#foodCatalogGrid .small{font-size:11px}#foodCatalogGrid .card .muted.small{padding:8px;background:#f7f9fc;border-radius:8px}
+#restaurantSection .card,#publicCatalogGrid .card{padding:20px}#adminSection .card{margin-top:12px}.item{border-color:#eaf0f7}
+body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #publicCatalogSection{display:none!important}body.admin-mode #foodCatalogSection{margin-top:0}body.admin-mode #foodCatalogSection .section-head h2:before{content:'🍽️';display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;margin-right:16px;background:#ff7626;color:white;border-radius:16px;font-size:26px;vertical-align:middle}body.admin-mode #foodCatalogSection .section-head{margin-bottom:15px}
+@media(max-width:850px){.foodtj-sidebar{width:78px;padding:0 8px 12px}.foodtj-side-brand{justify-content:center;padding:0;margin:0 -8px 14px;font-size:0;height:70px}.foodtj-side-brand span{display:none}.foodtj-side-brand:before{font-size:28px;content:'👨‍🍳'}.foodtj-nav a{justify-content:center;padding:13px 5px}.foodtj-nav a .nav-label{display:none}.foodtj-nav .nav-ico{font-size:22px}.foodtj-side-bottom{display:none}.top{margin-left:78px;padding:13px 16px}.wrap{margin-left:78px;padding:20px 14px 40px}#foodCatalogSection .toolbar{grid-template-columns:1fr 1fr}#foodCatalogSection .toolbar button{grid-column:1/-1}}
+@media(max-width:560px){.foodtj-sidebar{position:sticky;top:0;width:100%;height:auto;inset:auto;display:block;padding:7px;background:#111b2b}.foodtj-side-brand{display:none}.foodtj-nav{display:flex;overflow-x:auto;gap:5px}.foodtj-nav a{flex:0 0 auto;padding:10px 12px;font-size:12px}.foodtj-nav a .nav-label{display:inline}.foodtj-nav .nav-ico{font-size:16px;width:auto}.top{margin-left:0;min-height:60px;padding:12px 14px}.top>div:first-child{gap:8px;flex-wrap:wrap}.brand{font-size:22px}.top small{font-size:12px}.wrap{margin-left:0;padding:16px 11px 35px}.hero{padding:20px}.section-head h2{font-size:22px}#foodCatalogSection .toolbar{grid-template-columns:1fr}#foodCatalogSection .toolbar button{grid-column:auto}#foodCatalogGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#foodCatalogGrid .card img,#foodCatalogGrid .food-photo{height:105px}#foodCatalogGrid h3{font-size:14px}.top-actions{width:auto}.top-actions button{padding:8px 10px;font-size:12px}}
 </style>
 </head>
 <body>
+<aside class="foodtj-sidebar" aria-label="Менюи асосӣ">
+  <div class="foodtj-side-brand">Food<span>TJ</span></div>
+  <nav class="foodtj-nav">
+    <a href="#foodCatalogSection" class="active"><span class="nav-ico">⌂</span><span class="nav-label">Асосӣ</span></a>
+    <a href="#foodCatalogSection"><span class="nav-ico">▦</span><span class="nav-label">Каталог</span></a>
+    <a href="#myOrdersSection"><span class="nav-ico">▣</span><span class="nav-label">Фармоишҳо</span></a>
+    <a href="#accountPanel"><span class="nav-ico">♙</span><span class="nav-label">Истифодабарандагон</span></a>
+    <a href="#adminSection"><span class="nav-ico">▥</span><span class="nav-label">Таҳлилҳо</span></a>
+    <a href="#accountPanel"><span class="nav-ico">⚙</span><span class="nav-label">Танзимотҳо</span></a>
+  </nav>
+  <div class="foodtj-side-bottom"><strong>♨ FoodTJ</strong><p>Системаи идоракунии хӯрокҳо</p><p class="copyright">© 2026 FoodTJ. Ҳама ҳуқуқҳо ҳифз шудаанд.</p></div>
+</aside>
+
 <header class="top">
   <div><div class="brand">Food<span>TJ</span></div><small>Хӯрок фармоиш деҳ — ба хонаат расонем</small></div>
   <div class="top-actions">
@@ -53,33 +80,18 @@
     <div id="restaurants" class="grid"><div class="empty">Ресторанҳо бор шуда истодаанд...</div></div>
   </section>
 
-  <!-- ============ КАТАЛОГИ ХӮРОКҲОИ FoodTJ (нав) ============ -->
   <section id="foodCatalogSection" class="section">
     <div class="section-head">
       <h2>Каталоги хӯрокҳои FoodTJ</h2>
       <button id="reloadFoodCatalog" class="secondary">Навсозӣ</button>
     </div>
-
-    <p class="muted">
-      Хӯрокҳои каталоги умумӣ. Барои фармоиш онҳо бояд ба менюи
-      ресторани тасдиқшуда пайваст карда шаванд.
-    </p>
-
+    <p class="muted">Хӯрокҳои дастрас дар каталоги Душанбе. Нархҳое, ки дар база 0 мебошанд, ҳамчун нархи муайяннашуда нишон дода мешаванд.</p>
     <div class="toolbar">
-      <input
-        id="foodCatalogSearch"
-        placeholder="Ҷустуҷӯи хӯрок..."
-      >
-      <select id="foodCatalogCategory">
-        <option value="">Ҳамаи категорияҳо</option>
-      </select>
+      <input id="foodCatalogSearch" placeholder="Ҷустуҷӯи хӯрок...">
+      <select id="foodCatalogCategory"><option value="">Ҳамаи категорияҳо</option></select>
     </div>
-
-    <div id="foodCatalogGrid" class="grid">
-      <div class="empty">Каталог бор шуда истодааст...</div>
-    </div>
+    <div id="foodCatalogGrid" class="grid"><div class="empty">Каталог бор шуда истодааст...</div></div>
   </section>
-  <!-- ============ ТАМОМИ КАТАЛОГИ ХӮРОКҲО ============ -->
 
   <section id="publicCatalogSection" class="section">
     <div class="section-head"><h2>Каталогҳои онлайн дар Душанбе</h2><span class="muted">12 манбаи меню</span></div>
@@ -164,10 +176,10 @@ const SUPABASE_KEY = 'sb_publishable_UHJzsYIpimmjtDtHEnacQA_BJVKE2pD';
 
 const $ = (id) => document.getElementById(id);
 const money = (n) => `${Number(n || 0).toLocaleString('tg-TJ',{minimumFractionDigits:2,maximumFractionDigits:2})} сомонӣ`;
-const statusNames = {new:'Нав',accepted:'Қабул шуд',preparing:'Пухта шуда истодааст',ready_for_pickup:'Интизорӣ барои курьер',picked_up:'Курьер гирифт',delivering:'Дар роҳ',delivered:'Рассида шуд',cancelled:'Бекор шуд'};
+const statusNames = {new:'Нав',accepted:'Қабул шуд',preparing:'Пухта шуда истодааст',ready_for_pickup:'Интизорӣ барои курьер',picked_up:'Курьер гирифт',delivering:'Дар роҳ',delivered:'Расонида шуд',cancelled:'Бекор шуд'};
 let sb = null, currentUser = null, profile = null, authMode = 'login';
 let restaurants = [], currentRestaurant = null, menuItems = [], cart = new Map(), ownerRestaurants = [];
-let foodCatalogItems = [];   /* ✅ Тағйирёбандаи каталоги хӯрокҳо */
+let foodCatalogItems = [];
 let lastCatalog = [];
 
 /* ---------- Каталоги онлайн ---------- */
@@ -211,7 +223,7 @@ function renderPublicCatalog(){
 }
 
 /* ============================================================
-   КАТАЛОГИ ХӮРОКҲОИ FoodTJ — функсияҳо
+   КАТАЛОГИ ХӮРОКҲОИ FoodTJ
    ============================================================ */
 
 async function loadFoodCatalog() {
@@ -293,7 +305,7 @@ function renderFoodCatalog() {
               alt="${esc(item.name)}"
               loading="lazy"
               style="width:100%;height:160px;object-fit:cover;border-radius:10px">`
-          : '<div style="font-size:42px">🍽️</div>'
+          : `<div class="food-photo">${foodEmoji(item.name, item.category)}</div>`
       }
 
       <h3>${esc(item.name)}</h3>
@@ -333,6 +345,7 @@ function setBusy(button, busy, text) {
   button.disabled = busy;
   button.textContent = busy ? (text || 'Лутфан интизор шавед...') : button.dataset.original;
 }
+function foodEmoji(name, category){ const s = String(name || '') + ' ' + String(category || ''); if(/бургер/i.test(s)) return '🍔'; if(/фри|картошка/i.test(s)) return '🍟'; if(/кабоб|сихкабоб/i.test(s)) return '🍢'; if(/лагмон|лағмон|шӯрбо/i.test(s)) return '🍜'; if(/манту/i.test(s)) return '🥟'; if(/самбӯса/i.test(s)) return '🥮'; if(/оши палав/i.test(s)) return '🍛'; if(/пицца|питса/i.test(s)) return '🍕'; if(/салат/i.test(s)) return '🥗'; if(/шарбат|нӯшоки/i.test(s)) return '🧃'; return '🍽️'; }
 function moneyNumber(n){ return Math.round((Number(n)+Number.EPSILON)*100)/100; }
 function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function validConfig(){ return SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('PASTE_') && SUPABASE_KEY && !SUPABASE_KEY.includes('PASTE_'); }
@@ -352,10 +365,9 @@ async function init(){
     if(error) showNotice(error.message,'error');
     if(session) await loadProfile(session.user);
 
-    /* ✅ Боркунии ҳама чиз */
     await loadRestaurants();
     renderPublicCatalog();
-    await loadFoodCatalog();   /* ✅ Каталоги хӯрокҳо */
+    await loadFoodCatalog();
 
     sb.auth.onAuthStateChange((_event, session) => {
       setTimeout(async () => {
@@ -370,6 +382,7 @@ async function init(){
 }
 function resetSession(){
   currentUser = null; profile = null;
+  document.body.classList.remove('admin-mode');
   toggle('accountTop', false); toggle('logoutTop', false); toggle('loginTop', true);
   ['accountPanel','myOrdersSection','courierSection','restaurantOwnerSection','adminSection'].forEach(id => toggle(id, false));
 }
@@ -393,6 +406,7 @@ async function loadProfile(user){
     p = newP;
   }
   profile = p;
+  document.body.classList.toggle('admin-mode', p.role === 'admin');
   toggle('loginTop', false); toggle('accountTop', true); toggle('logoutTop', true); toggle('accountPanel', true);
   $('roleBadge').textContent = roleLabel(p.role);
   $('accountDetails').textContent = (p.full_name || user.email || 'Истифодабаранда') + ' • ' + (user.email || '') + (p.phone ? ' • ' + p.phone : '');
@@ -766,7 +780,7 @@ $('restaurantOrders').onclick = async e => {
 };
 $('reloadAdmin').onclick = loadAdminOrders;
 
-/* ✅ Event listener-ҳои каталоги хӯрокҳо */
+document.querySelectorAll('.foodtj-nav a').forEach(link => link.addEventListener('click', () => { document.querySelectorAll('.foodtj-nav a').forEach(a => a.classList.remove('active')); link.classList.add('active'); }));
 $('foodCatalogSearch').addEventListener('input', renderFoodCatalog);
 $('foodCatalogCategory').addEventListener('change', renderFoodCatalog);
 $('reloadFoodCatalog').addEventListener('click', loadFoodCatalog);
