@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111827">
+<title>FoodTJ — расонидани хӯрок</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f4f6fa;--panel:#fff;--ink:#172033;--muted:#697386;--line:#e3e8f0;--green:#16a34a;--dark:#111827;--red:#dc2626}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,textarea,select{font:inherit}
+button{border:0;border-radius:10px;padding:11px 15px;background:var(--green);color:#fff;font-weight:700;cursor:pointer}
+button.secondary{background:#e8edf5;color:var(--ink)}
+button:disabled{opacity:.55;cursor:not-allowed}
+.top{background:var(--dark);color:white;padding:16px 4%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-size:24px;font-weight:900}
+.brand span{color:#4ade80}
+.top small{color:#cbd5e1}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+.top-actions button.secondary{background:#273449;color:white}
+.wrap{max-width:1150px;margin:0 auto;padding:22px 16px 60px}
+.hero{background:linear-gradient(120deg,#052e16,#166534);color:white;border-radius:20px;padding:28px;margin-bottom:22px;display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:center}
+.hero h1{font-size:clamp(28px,5vw,44px);line-height:1.1;margin:0 0 12px}
+.hero p{color:#dcfce7;line-height:1.6;margin:0}
+.hero .emoji{font-size:76px;text-align:center}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 18px}
+.toolbar input{flex:1;min-width:190px}
+input,textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:white;color:var(--ink)}
+textarea{min-height:80px;resize:vertical}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:15px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:0 4px 14px #0f172a08}
+.card h3{margin:0 0 7px}
+.muted{color:var(--muted);font-size:14px}
+.pill{display:inline-block;background:#dcfce7;color:#166534;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:700}
+.pill.gray{background:#edf0f5;color:#475569}
+.section{margin-top:25px}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.section h2{font-size:22px;margin:0 0 12px}
+.hidden{display:none!important}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.row>*{flex:1}
+.row button{flex:0 0 auto}
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.formgrid .full{grid-column:1/-1}
+.notice{padding:12px 14px;border-radius:10px;background:#eff6ff;color:#1e40af;margin:12px 0;white-space:pre-wrap}
+.notice.error{background:#fef2f2;color:#991b1b}
+.notice.success{background:#f0fdf4;color:#166534}
+.item{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:12px 0}
+.price{font-weight:800;white-space:nowrap}
+.cartbar{position:sticky;bottom:12px;background:#111827;color:white;border-radius:14px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px}
+.cartbar small{color:#cbd5e1}
+.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:32px}
+.empty{padding:28px;text-align:center;color:var(--muted);background:white;border:1px dashed #cbd5e1;border-radius:14px}
+.small{font-size:12px}
+.order-card{margin-bottom:12px}
+@media(max-width:650px){
+ .hero{grid-template-columns:1fr;padding:22px}
+ .hero .emoji{display:none}
+ .formgrid{grid-template-columns:1fr}
+ .top{padding:14px}
+ .wrap{padding:16px 12px 45px}
+ .cartbar{align-items:flex-start;flex-direction:column}
+ .top-actions{width:100%}
+ .top-actions button{flex:1}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div>
+    <div class="brand">Food<span>TJ</span></div>
+    <small>Хӯрок фармоиш деҳ — ба хонаат расонем</small>
+  </div>
+  <div class="top-actions">
+    <button class="secondary" id="loginTop">Вуруд / Сабти ном</button>
+    <button class="secondary hidden" id="accountTop">Ҳисоб</button>
+    <button class="secondary hidden" id="logoutTop">Баромадан</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <h1>Хӯроки дӯстдоштаатро фармоиш деҳ.</h1>
+      <p>Ресторанро интихоб кун, аз меню хӯрок илова кун ва суроғаи расониданро навис.</p>
+    </div>
+    <div class="emoji">🍔 🍕 🥘</div>
+  </section>
+
+  <div id="notice" class="notice hidden" role="status"></div>
+
+  <section id="authPanel" class="card hidden">
+    <div class="section-head">
+      <h2 id="authTitle">Вуруд ба FoodTJ</h2>
+      <button class="secondary" id="closeAuth">Пӯшидан</button>
+    </div>
+    <div class="formgrid">
+      <input id="authName" class="hidden" placeholder="Ному насаб">
+      <input id="authPhone" placeholder="Рақами телефон (ихтиёрӣ)">
+      <input id="authEmail" type="email" placeholder="Email" autocomplete="email">
+      <input id="authPassword" type="password" placeholder="Парол" autocomplete="current-password">
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button id="authSubmit">Вуруд</button>
+      <button class="secondary" id="toggleSignup">Сабти номи нав</button>
+    </div>
+    <p class="muted small">Ҳангоми сабти ном нақш худкор «муштарӣ» мешавад. Нақши курьер ё ресторанро администратор таъин мекунад.</p>
+  </section>
+
+  <section id="accountPanel" class="card hidden section">
+    <div class="section-head">
+      <h2>Ҳисоби ман</h2>
+      <span id="roleBadge" class="pill">Муштарӣ</span>
+    </div>
+    <p id="accountDetails" class="muted"></p>
+    <div id="courierAvailability" class="hidden row">
+      <button id="availabilityBtn">Фаъол кардани дастрасӣ</button>
+      <span id="availabilityText" class="muted"></span>
+    </div>
+  </section>
+
+  <section id="restaurantSection" class="section">
+    <div class="section-head">
+      <h2>Ресторанҳо</h2>
+      <span id="restaurantCount" class="muted"></span>
+    </div>
+    <div class="toolbar">
+      <input id="searchRestaurants" placeholder="Ҷустуҷӯи ресторан...">
+      <button id="reloadRestaurants" class="secondary">Навсозӣ</button>
+    </div>
+    <div id="restaurants" class="grid">
+      <div class="empty">Ресторанҳо бор шуда истодаанд...</div>
+    </div>
+  </section>
+
+  <section id="menuSection" class="section hidden">
+    <div class="section-head">
+      <h2 id="menuTitle">Меню</h2>
+      <button class="secondary" id="backRestaurants">← Ресторанҳо</button>
+    </div>
+    <p id="menuDescription" class="muted"></p>
+    <div id="menuItems" class="grid"></div>
+    <div id="cartBar" class="cartbar hidden">
+      <div>
+        <strong id="cartCount">0 хӯрок</strong><br>
+        <small id="cartTotal">Ҷамъ: 0 сомонӣ</small>
+      </div>
+      <button id="checkoutBtn">Фармоиш додан</button>
+    </div>
+  </section>
+
+  <section id="checkoutSection" class="card section hidden">
+    <div class="section-head">
+      <h2>Суроғаи расонидан</h2>
+      <button class="secondary" id="cancelCheckout">Бекор</button>
+    </div>
+    <div class="formgrid">
+      <input id="deliveryAddress" class="full" placeholder="Суроғаи пурра дар Душанбе">
+      <input id="deliveryPhone" placeholder="Рақами телефон">
+      <select id="paymentMethod">
+        <option value="cash">Пули нақд</option>
+        <option value="wallet" disabled>Ҳамёни FoodTJ — ҳоло фаъол нест</option>
+        <option value="online" disabled>Пардохти онлайн — ҳоло фаъол нест</option>
+      </select>
+      <textarea id="orderNotes" class="full" placeholder="Шарҳ (ихтиёрӣ)"></textarea>
+    </div>
+    <p class="muted small">Ҳоло танҳо пардохти нақдӣ дастрас аст.</p>
+    <button id="placeOrder">Тасдиқи фармоиш</button>
+  </section>
+
+  <section id="myOrdersSection" class="section hidden">
+    <h2>Фармоишҳои ман</h2>
+    <div id="myOrders"></div>
+  </section>
+
+  <section id="courierSection" class="section hidden">
+    <div class="section-head">
+      <h2>Панели курьер</h2>
+      <button class="secondary" id="reloadCourier">Навсозӣ</button>
+    </div>
+    <p class="muted">Барои дидани фармоишҳо нақши courier ва дастрасии фаъол лозим аст.</p>
+    <div id="courierOrders"></div>
+  </section>
+
+  <section id="restaurantOwnerSection" class="section hidden">
+    <h2>Панели ресторан</h2>
+    <div class="card">
+      <h3>Илова кардани ресторан</h3>
+      <div class="formgrid">
+        <input id="newRestName" placeholder="Номи ресторан">
+        <input id="newRestPhone" placeholder="Телефон">
+        <input id="newRestAddress" class="full" placeholder="Суроға">
+        <textarea id="newRestDescription" class="full" placeholder="Тавсифи ресторан"></textarea>
+      </div>
+      <button id="createRestaurant" style="margin-top:10px">Фиристодан барои тасдиқ</button>
+      <p class="muted small">Барои намоён шудан ресторан бояд аз тарафи администратор тасдиқ шавад.</p>
+    </div>
+
+    <div class="card section">
+      <h3>Ресторанҳои ман</h3>
+      <div id="ownerRestaurants"></div>
+    </div>
+
+    <div class="card section">
+      <h3>Иловаи хӯрок</h3>
+      <div class="formgrid">
+        <select id="ownerRestaurantSelect" class="full">
+          <option value="">Аввал ресторанро интихоб кунед</option>
+        </select>
+        <input id="newItemName" placeholder="Номи хӯрок">
+        <input id="newItemPrice" type="number" min="0" step="0.01" placeholder="Нарх бо сомонӣ">
+        <textarea id="newItemDescription" class="full" placeholder="Тавсифи хӯрок"></textarea>
+      </div>
+      <button id="createMenuItem" style="margin-top:10px">Илова кардани хӯрок</button>
+    </div>
+
+    <div class="card section">
+      <h3>Фармоишҳои ресторан</h3>
+      <div id="restaurantOrders"></div>
+    </div>
+  </section>
+
+  <section id="adminSection" class="section hidden">
+    <h2>Панели администратор</h2>
+    <div class="card">
+      <p>Барои тасдиқи ресторан ва таъини нақшҳо функсияҳои махсуси администратор лозиманд.</p>
+      <button id="reloadAdmin">Навсозии фармоишҳо</button>
+      <div id="adminOrders" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <div class="footer">FoodTJ • Версияи аввал • Душанбе, Тоҷикистон</div>
+</main>
