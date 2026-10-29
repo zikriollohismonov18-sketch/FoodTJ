@@ -96,7 +96,7 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
       <h3>Пур кардани ҳамён</h3>
       <p class="muted">Ин ҷо аввал дархости пуркунӣ сабт мешавад. Бақия танҳо баъди тасдиқи воқеии маблағ аз ҷониби администратор зиёд мешавад.</p>
       <div class="formgrid">
-        <div><label for="walletAmount" class="muted">Маблағ (сомонӣ)</label><input id="walletAmount" type="number" min="10" max="5000" step="0.01" placeholder="Масалан, 100"></div>
+        <div><label for="walletAmount" class="muted">Маблағ (сомонӣ, ҳадди ақал 20)</label><input id="walletAmount" type="number" min="20" max="5000" step="0.01" placeholder="Масалан, 100"></div>
         <div><label for="walletMethod" class="muted">Усули пардохт</label><select id="walletMethod"><option value="alif">Alif Mobi</option><option value="dushanbe_city">Dushanbe City</option><option value="eskhata">Эсхата Онлайн</option><option value="cash">Нақд ба намояндаи FoodTJ</option></select></div>
       </div>
       <button id="walletTopupRequest" style="margin-top:12px">Дархости пуркунӣ</button>
@@ -471,7 +471,7 @@ async function loadWallet(){
 async function requestWalletTopup(){
   if(!requireLogin()) return;
   const amount=Number($('walletAmount').value);
-  if(!Number.isFinite(amount) || amount<10 || amount>5000){ showNotice('Маблағ бояд аз 10 то 5000 сомонӣ бошад.','error'); return; }
+  if(!Number.isFinite(amount) || amount<20 || amount>5000){ showNotice('Маблағ бояд аз 20 то 5000 сомонӣ бошад.','error'); return; }
   const btn=$('walletTopupRequest'); setBusy(btn,true,'Дархост фиристода мешавад...');
   try{
     const {error}=await sb.from('foodtj_wallet_topup_requests').insert({user_id:currentUser.id,amount:moneyNumber(amount),method:$('walletMethod').value});
