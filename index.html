@@ -53,6 +53,34 @@
     <div id="restaurants" class="grid"><div class="empty">Ресторанҳо бор шуда истодаанд...</div></div>
   </section>
 
+  <!-- ============ КАТАЛОГИ ХӮРОКҲОИ FoodTJ (нав) ============ -->
+  <section id="foodCatalogSection" class="section">
+    <div class="section-head">
+      <h2>Каталоги хӯрокҳои FoodTJ</h2>
+      <button id="reloadFoodCatalog" class="secondary">Навсозӣ</button>
+    </div>
+
+    <p class="muted">
+      Хӯрокҳои каталоги умумӣ. Барои фармоиш онҳо бояд ба менюи
+      ресторани тасдиқшуда пайваст карда шаванд.
+    </p>
+
+    <div class="toolbar">
+      <input
+        id="foodCatalogSearch"
+        placeholder="Ҷустуҷӯи хӯрок..."
+      >
+      <select id="foodCatalogCategory">
+        <option value="">Ҳамаи категорияҳо</option>
+      </select>
+    </div>
+
+    <div id="foodCatalogGrid" class="grid">
+      <div class="empty">Каталог бор шуда истодааст...</div>
+    </div>
+  </section>
+  <!-- ============ ТАМОМИ КАТАЛОГИ ХӮРОКҲО ============ -->
+
   <section id="publicCatalogSection" class="section">
     <div class="section-head"><h2>Каталогҳои онлайн дар Душанбе</h2><span class="muted">12 манбаи меню</span></div>
     <p class="muted">Ин каталогҳо барои дидани тарабхона ва намунаи нархҳо ҳастанд. Онҳо ҳоло шарикони тасдиқшудаи FoodTJ нестанд; фармоишро аз менюи расмии худи тарабхона санҷед.</p>
@@ -128,7 +156,7 @@
 
 <script>
 /* ============================================================
-   FoodTJ — версияи ниҳоӣ (каталоги онлайн + 8% + ислоҳот)
+   FoodTJ — версияи ниҳоӣ + Каталоги хӯрокҳо
    ============================================================ */
 
 const SUPABASE_URL = 'https://rgminzzmlktkliliiupt.supabase.co';
@@ -136,9 +164,11 @@ const SUPABASE_KEY = 'sb_publishable_UHJzsYIpimmjtDtHEnacQA_BJVKE2pD';
 
 const $ = (id) => document.getElementById(id);
 const money = (n) => `${Number(n || 0).toLocaleString('tg-TJ',{minimumFractionDigits:2,maximumFractionDigits:2})} сомонӣ`;
-const statusNames = {new:'Нав',accepted:'Қабул шуд',preparing:'Пухта шуда истодааст',ready_for_pickup:'Интизорӣ барои курьер',picked_up:'Курьер гирифт',delivering:'Дар роҳ',delivered:'Расонида шуд',cancelled:'Бекор шуд'};
+const statusNames = {new:'Нав',accepted:'Қабул шуд',preparing:'Пухта шуда истодааст',ready_for_pickup:'Интизорӣ барои курьер',picked_up:'Курьер гирифт',delivering:'Дар роҳ',delivered:'Рассида шуд',cancelled:'Бекор шуд'};
 let sb = null, currentUser = null, profile = null, authMode = 'login';
 let restaurants = [], currentRestaurant = null, menuItems = [], cart = new Map(), ownerRestaurants = [];
+let foodCatalogItems = [];   /* ✅ Тағйирёбандаи каталоги хӯрокҳо */
+let lastCatalog = [];
 
 /* ---------- Каталоги онлайн ---------- */
 const publicCatalog = [
@@ -180,7 +210,115 @@ function renderPublicCatalog(){
   `).join('');
 }
 
-/* ---------- Кӯмакчиҳо ---------- */
+/* ============================================================
+   КАТАЛОГИ ХӮРОКҲОИ FoodTJ — функсияҳо
+   ============================================================ */
+
+async function loadFoodCatalog() {
+  const grid = $('foodCatalogGrid');
+  if (!sb || !grid) return;
+
+  grid.innerHTML = '<div class="empty">Каталог бор шуда истодааст...</div>';
+
+  const { data, error } = await sb
+    .from('foodtj_catalog_items')
+    .select('id,name,category,description,price,city,image_url,is_active')
+    .eq('city', 'Dushanbe')
+    .eq('is_active', true)
+    .order('category')
+    .order('name');
+
+  if (error) {
+    grid.innerHTML =
+      '<div class="empty">Хатои боркунии каталог: ' +
+      esc(error.message) + '</div>';
+    return;
+  }
+
+  foodCatalogItems = data || [];
+
+  const categorySelect = $('foodCatalogCategory');
+  const previousCategory = categorySelect.value;
+  const categories = [...new Set(
+    foodCatalogItems
+      .map(item => item.category)
+      .filter(Boolean)
+  )].sort();
+
+  categorySelect.innerHTML =
+    '<option value="">Ҳамаи категорияҳо</option>' +
+    categories.map(category =>
+      `<option value="${esc(category)}">${esc(category)}</option>`
+    ).join('');
+
+  if (categories.includes(previousCategory)) {
+    categorySelect.value = previousCategory;
+  }
+
+  renderFoodCatalog();
+}
+
+function renderFoodCatalog() {
+  const grid = $('foodCatalogGrid');
+  if (!grid) return;
+
+  const query = ($('foodCatalogSearch').value || '')
+    .trim()
+    .toLowerCase();
+
+  const category = $('foodCatalogCategory').value;
+
+  const filtered = foodCatalogItems.filter(item => {
+    const text = [
+      item.name,
+      item.category,
+      item.description
+    ].join(' ').toLowerCase();
+
+    return text.includes(query) &&
+      (!category || item.category === category);
+  });
+
+  if (!filtered.length) {
+    grid.innerHTML =
+      '<div class="empty">Хӯрок ёфт нашуд.</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(item => `
+    <article class="card">
+      ${
+        item.image_url
+          ? `<img src="${esc(item.image_url)}"
+              alt="${esc(item.name)}"
+              loading="lazy"
+              style="width:100%;height:160px;object-fit:cover;border-radius:10px">`
+          : '<div style="font-size:42px">🍽️</div>'
+      }
+
+      <h3>${esc(item.name)}</h3>
+      <span class="pill gray">${esc(item.category || 'Хӯрок')}</span>
+
+      <p class="muted">${esc(item.description || '')}</p>
+
+      <p class="price">
+        ${
+          Number(item.price) > 0
+            ? money(item.price)
+            : 'Нарх ҳоло муайян нашудааст'
+        }
+      </p>
+
+      <p class="muted small">
+        Барои фармоиш аз менюи ресторани тасдиқшуда истифода баред.
+      </p>
+    </article>
+  `).join('');
+}
+
+/* ============================================================
+   Кӯмакчиҳо
+   ============================================================ */
 function showNotice(message, type='info') {
   const n = $('notice'); if(!n){alert(message);return;}
   n.textContent = message;
@@ -213,8 +351,12 @@ async function init(){
     const { data:{session}, error } = await sb.auth.getSession();
     if(error) showNotice(error.message,'error');
     if(session) await loadProfile(session.user);
+
+    /* ✅ Боркунии ҳама чиз */
     await loadRestaurants();
     renderPublicCatalog();
+    await loadFoodCatalog();   /* ✅ Каталоги хӯрокҳо */
+
     sb.auth.onAuthStateChange((_event, session) => {
       setTimeout(async () => {
         if(session) await loadProfile(session.user);
@@ -277,7 +419,7 @@ async function loadRestaurants(){
   renderRestaurants();
 }
 function renderRestaurants(){
-  const q = ($('searchRestaurants').value || '').trim().toLowerCase();
+  const q = ($('searchRestaurants')?.value || '').trim().toLowerCase();
   const list = restaurants.filter(r => ((r.name || '') + ' ' + (r.address || '') + ' ' + (r.description || '')).toLowerCase().includes(q));
   $('restaurantCount').textContent = `${list.length} ресторан`;
   if(!list.length){ $('restaurants').innerHTML = '<div class="empty">Ҳоло ресторан нест ё натиҷа ёфт нашуд.</div>'; return; }
@@ -295,7 +437,7 @@ function renderRestaurants(){
 
 /* ---------- Меню ---------- */
 async function openRestaurant(id){
-  const r = restaurants.find(x => x.id === id); if(!r) return;
+  const r = restaurants.find(x => String(x.id) === String(id)); if(!r) return;
   currentRestaurant = r; cart.clear();
   $('menuTitle').textContent = r.name;
   $('menuDescription').textContent = (r.description || '') + ' • ' + (r.address || 'Душанбе');
@@ -348,8 +490,8 @@ async function loadMyOrders(){
   if(!data?.length){ $('myOrders').innerHTML = '<div class="empty">Шумо ҳоло фармоиш надоред.</div>'; return; }
   $('myOrders').innerHTML = data.map(o => `
     <article class="card order-card">
-      <div class="section-head"><strong>Фармоиш #${esc(o.id.slice(0,8))}</strong><span class="pill">${esc(statusNames[o.status] || o.status)}</span></div>
-      <p class="muted">${new Date(o.created_at).toLocaleString('tg-TJ')} • ${esc(o.delivery_address)}</p>
+      <div class="section-head"><strong>Фармоиш #${esc(String(o.id).slice(0,8))}</strong><span class="pill">${esc(statusNames[o.status] || o.status)}</span></div>
+      <p class="muted">${new Date(o.created_at).toLocaleString('tg-TJ')} • ${esc(o.delivery_address || '')}</p>
       <strong>${money(o.total)}</strong>
     </article>
   `).join('');
@@ -435,7 +577,7 @@ function restaurantOrderHtml(o){
   if(o.status === 'accepted') options = '<option value="preparing">Оғози тайёркунӣ</option>';
   if(o.status === 'preparing') options = '<option value="ready_for_pickup">Омода барои курьер</option>';
   return `<article class="card order-card">
-    <div class="section-head"><strong>#${esc(o.id.slice(0,8))}</strong><span class="pill">${esc(statusNames[o.status] || o.status)}</span></div>
+    <div class="section-head"><strong>#${esc(String(o.id).slice(0,8))}</strong><span class="pill">${esc(statusNames[o.status] || o.status)}</span></div>
     <p class="muted">${esc(o.delivery_address || '')} • ${money(o.total)}</p>
     ${options ? `<div class="row"><select id="st-${o.id}">${options}</select><button data-restaurant-status="${o.id}">Нав кардани ҳолат</button></div>` : ''}
   </article>`;
@@ -447,7 +589,7 @@ async function loadAdminOrders(){
   if(error){ $('adminOrders').textContent = error.message; return; }
   $('adminOrders').innerHTML = (data || []).map(o => `
     <article class="item">
-      <div><strong>#${esc(o.id.slice(0,8))}</strong><div class="muted">${esc(o.status)} • ${new Date(o.created_at).toLocaleString('tg-TJ')}</div></div>
+      <div><strong>#${esc(String(o.id).slice(0,8))}</strong><div class="muted">${esc(o.status)} • ${new Date(o.created_at).toLocaleString('tg-TJ')}</div></div>
       <strong>${money(o.total)}</strong>
     </article>
   `).join('') || '<div class="empty">Фармоиш нест.</div>';
@@ -538,7 +680,7 @@ $('publicCatalogSearch').addEventListener('input', renderPublicCatalog);
 $('restaurants').onclick = e => { const b = e.target.closest('[data-open-restaurant]'); if(b) openRestaurant(b.dataset.openRestaurant); };
 $('menuItems').onclick = e => {
   const b = e.target.closest('[data-add]'); if(!b) return;
-  const item = menuItems.find(m => m.id === b.dataset.add); if(!item) return;
+  const item = menuItems.find(m => String(m.id) === String(b.dataset.add)); if(!item) return;
   const row = cart.get(item.id) || { item, quantity: 0 };
   row.quantity++;
   cart.set(item.id, row);
@@ -623,6 +765,11 @@ $('restaurantOrders').onclick = async e => {
   await loadOwnerPanel();
 };
 $('reloadAdmin').onclick = loadAdminOrders;
+
+/* ✅ Event listener-ҳои каталоги хӯрокҳо */
+$('foodCatalogSearch').addEventListener('input', renderFoodCatalog);
+$('foodCatalogCategory').addEventListener('change', renderFoodCatalog);
+$('reloadFoodCatalog').addEventListener('click', loadFoodCatalog);
 
 /* ---------- Оғоз ---------- */
 init().catch(e => {
