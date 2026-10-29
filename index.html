@@ -168,7 +168,7 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
 
 <script>
 /* ============================================================
-   FoodTJ — версияи ниҳоӣ + Каталоги хӯрокҳо
+   FoodTJ — версияи ниҳоӣ (ҳамаи мушкилот ислоҳ шудаанд)
    ============================================================ */
 
 const SUPABASE_URL = 'https://rgminzzmlktkliliiupt.supabase.co';
@@ -180,7 +180,6 @@ const statusNames = {new:'Нав',accepted:'Қабул шуд',preparing:'Пух
 let sb = null, currentUser = null, profile = null, authMode = 'login';
 let restaurants = [], currentRestaurant = null, menuItems = [], cart = new Map(), ownerRestaurants = [];
 let foodCatalogItems = [];
-let lastCatalog = [];
 
 /* ---------- Каталоги онлайн ---------- */
 const publicCatalog = [
@@ -406,22 +405,23 @@ async function loadProfile(user){
     p = newP;
   }
   profile = p;
-  document.body.classList.toggle('admin-mode', p.role === 'admin');
+  const role = p.role || 'customer';
+  document.body.classList.toggle('admin-mode', role === 'admin');
   toggle('loginTop', false); toggle('accountTop', true); toggle('logoutTop', true); toggle('accountPanel', true);
-  $('roleBadge').textContent = roleLabel(p.role);
+  $('roleBadge').textContent = roleLabel(role);
   $('accountDetails').textContent = (p.full_name || user.email || 'Истифодабаранда') + ' • ' + (user.email || '') + (p.phone ? ' • ' + p.phone : '');
   if($('deliveryPhone')) $('deliveryPhone').value = p.phone || '';
-  toggle('courierAvailability', p.role === 'courier');
+  toggle('courierAvailability', role === 'courier');
   $('availabilityText').textContent = p.is_available ? 'Дастрас ҳастед' : 'Ҳоло дастрас нестед';
   $('availabilityBtn').textContent = p.is_available ? 'Хомӯш кардани дастрасӣ' : 'Фаъол кардани дастрасӣ';
-  toggle('myOrdersSection', p.role === 'customer' || p.role === 'admin');
-  toggle('courierSection', p.role === 'courier');
-  toggle('restaurantOwnerSection', p.role === 'restaurant');
-  toggle('adminSection', p.role === 'admin');
-  if(p.role === 'customer' || p.role === 'admin') await loadMyOrders();
-  if(p.role === 'courier') await loadCourierOrders();
-  if(p.role === 'restaurant') await loadOwnerPanel();
-  if(p.role === 'admin') await loadAdminOrders();
+  toggle('myOrdersSection', role === 'customer' || role === 'admin');
+  toggle('courierSection', role === 'courier');
+  toggle('restaurantOwnerSection', role === 'restaurant');
+  toggle('adminSection', role === 'admin');
+  if(role === 'customer' || role === 'admin') await loadMyOrders();
+  if(role === 'courier') await loadCourierOrders();
+  if(role === 'restaurant') await loadOwnerPanel();
+  if(role === 'admin') await loadAdminOrders();
 }
 
 /* ---------- Ресторанҳо ---------- */
@@ -439,7 +439,9 @@ function renderRestaurants(){
   if(!list.length){ $('restaurants').innerHTML = '<div class="empty">Ҳоло ресторан нест ё натиҷа ёфт нашуд.</div>'; return; }
   $('restaurants').innerHTML = list.map(r => `
     <article class="card">
-      <div style="font-size:36px;margin-bottom:8px">🍽️</div>
+      ${r.image_url
+        ? `<img src="${esc(r.image_url)}" alt="${esc(r.name)}" style="width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:8px">`
+        : '<div style="font-size:36px;margin-bottom:8px">🍽️</div>'}
       <h3>${esc(r.name)}</h3>
       <p class="muted">${esc(r.description || '')}</p>
       <p class="muted">📍 ${esc(r.address || 'Душанбе')}</p>
@@ -467,7 +469,9 @@ function renderMenu(){
   if(!menuItems.length){ $('menuItems').innerHTML = '<div class="empty">Ин ресторан ҳоло хӯроки дастрас надорад.</div>'; return; }
   $('menuItems').innerHTML = menuItems.map(m => `
     <article class="card">
-      <div style="font-size:30px">🥘</div>
+      ${m.image_url
+        ? `<img src="${esc(m.image_url)}" alt="${esc(m.name)}" style="width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:8px">`
+        : '<div style="font-size:30px">🥘</div>'}
       <h3>${esc(m.name)}</h3>
       <p class="muted">${esc(m.description || '')}</p>
       <div class="row"><span class="price">${money(m.price)}</span><button data-add="${m.id}">+ Илова</button></div>
@@ -688,6 +692,53 @@ $('toggleSignup').onclick = () => {
 $('authSubmit').onclick = signInOrUp;
 $('logoutTop').onclick = async () => { if(sb) await sb.auth.signOut(); resetSession(); showNotice('Шумо аз ҳисоб баромадед.', 'success'); };
 $('accountTop').onclick = () => { toggle('accountPanel', true); $('accountPanel').scrollIntoView({behavior:'smooth'}); };
+
+/* ---------- Sidebar навигатсия (ТАНҲО ЯК LISTENER) ---------- */
+document.querySelectorAll('.foodtj-nav a').forEach(link => {
+  link.addEventListener('click', (e) => {
+    const href = link.getAttribute('href') || '';
+    if (!href.startsWith('#')) return;
+    const targetId = href.slice(1);
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    const role = profile?.role || null;
+    if (targetId === 'myOrdersSection' && (!currentUser || !['customer', 'admin'].includes(role))) {
+      e.preventDefault();
+      showNotice('Барои дидани фармоишҳо аввал ворид шавед.', 'error');
+      if (!currentUser) { toggle('authPanel', true); $('authPanel')?.scrollIntoView({behavior:'smooth', block:'start'}); }
+      return;
+    }
+    if (targetId === 'adminSection' && role !== 'admin') {
+      e.preventDefault();
+      showNotice('Ин бахш танҳо барои администратор аст.', 'error');
+      return;
+    }
+    if (targetId === 'courierSection' && role !== 'courier') {
+      e.preventDefault();
+      showNotice('Ин бахш танҳо барои курьер аст.', 'error');
+      return;
+    }
+    if (targetId === 'restaurantOwnerSection' && role !== 'restaurant') {
+      e.preventDefault();
+      showNotice('Ин бахш танҳо барои ресторан аст.', 'error');
+      return;
+    }
+    if (targetId === 'accountPanel' && !currentUser) {
+      e.preventDefault();
+      toggle('authPanel', true);
+      $('authPanel')?.scrollIntoView({behavior:'smooth', block:'start'});
+      showNotice('Барои кушодани ҳисоб аввал ворид шавед.', 'error');
+      return;
+    }
+
+    document.querySelectorAll('.foodtj-nav a').forEach(a => a.classList.remove('active'));
+    link.classList.add('active');
+    if (target.classList.contains('hidden')) target.classList.remove('hidden');
+    target.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+});
+
 $('searchRestaurants').oninput = renderRestaurants;
 $('reloadRestaurants').onclick = loadRestaurants;
 $('publicCatalogSearch').addEventListener('input', renderPublicCatalog);
@@ -780,7 +831,6 @@ $('restaurantOrders').onclick = async e => {
 };
 $('reloadAdmin').onclick = loadAdminOrders;
 
-document.querySelectorAll('.foodtj-nav a').forEach(link => link.addEventListener('click', () => { document.querySelectorAll('.foodtj-nav a').forEach(a => a.classList.remove('active')); link.classList.add('active'); }));
 $('foodCatalogSearch').addEventListener('input', renderFoodCatalog);
 $('foodCatalogCategory').addEventListener('change', renderFoodCatalog);
 $('reloadFoodCatalog').addEventListener('click', loadFoodCatalog);
