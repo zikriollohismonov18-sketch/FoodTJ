@@ -11,7 +11,7 @@
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}button,input,textarea,select{font:inherit}button{border:0;border-radius:10px;padding:11px 15px;background:var(--green);color:#fff;font-weight:700;cursor:pointer}button.secondary{background:#e8edf5;color:var(--ink)}button.danger{background:var(--red)}button:disabled{opacity:.55;cursor:not-allowed}.top{background:var(--dark);color:white;padding:16px 4%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.brand{font-size:24px;font-weight:900;letter-spacing:-.6px}.brand span{color:#4ade80}.top small{color:#cbd5e1}.top-actions{display:flex;gap:8px;flex-wrap:wrap}.top-actions button.secondary{background:#273449;color:white}.wrap{max-width:1150px;margin:0 auto;padding:22px 16px 60px}.hero{background:linear-gradient(120deg,#052e16,#166534);color:white;border-radius:20px;padding:28px;margin-bottom:22px;display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:center}.hero h1{font-size:clamp(28px,5vw,44px);line-height:1.1;margin:0 0 12px}.hero p{color:#dcfce7;line-height:1.6;margin:0}.hero .emoji{font-size:76px;text-align:center}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 18px}.toolbar input{flex:1;min-width:190px}.field, input,textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:white;color:var(--ink)}textarea{min-height:80px;resize:vertical}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:15px}.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:0 4px 14px #0f172a08}.card h3{margin:0 0 7px}.muted{color:var(--muted);font-size:14px}.pill{display:inline-block;background:#dcfce7;color:#166534;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:700}.pill.gray{background:#edf0f5;color:#475569}.section{margin-top:25px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.section h2{font-size:22px;margin:0 0 12px}.hidden{display:none!important}.stack{display:grid;gap:10px}.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.row>*{flex:1}.row button{flex:0 0 auto}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.formgrid .full{grid-column:1/-1}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.tabs button{background:#e8edf5;color:#334155}.tabs button.active{background:var(--dark);color:white}.notice{padding:12px 14px;border-radius:10px;background:#eff6ff;color:#1e40af;margin:12px 0;white-space:pre-wrap}.notice.error{background:#fef2f2;color:#991b1b}.notice.success{background:#f0fdf4;color:#166534}.item{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:12px 0}.item:last-child{border-bottom:0}.price{font-weight:800;white-space:nowrap}.cartbar{position:sticky;bottom:12px;background:#111827;color:white;border-radius:14px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;box-shadow:0 8px 24px #0002}.cartbar small{color:#cbd5e1}.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:32px}.status{font-weight:700;color:#166534}.empty{padding:28px;text-align:center;color:var(--muted);background:white;border:1px dashed #cbd5e1;border-radius:14px}.small{font-size:12px}.order-card{margin-bottom:12px}.menu-actions{display:flex;gap:8px;align-items:center}.menu-actions input{width:70px;flex:0 0 70px}.danger-text{color:#b91c1c}a{color:var(--green);font-weight:700;text-decoration:none}a:hover{text-decoration:underline}
 @media(max-width:650px){.hero{grid-template-columns:1fr;padding:22px}.hero .emoji{display:none}.formgrid{grid-template-columns:1fr}.top{padding:14px}.wrap{padding:16px 12px 45px}.cartbar{align-items:flex-start;flex-direction:column}.top-actions{width:100%}.top-actions button{flex:1}}
 
-/* ===== FoodTJ dashboard refresh: inspired by the supplied reference ===== */
+/* ===== FoodTJ dashboard refresh ===== */
 :root{--bg:#f4f7fc;--panel:#fff;--ink:#111c2f;--muted:#61718b;--line:#e6edf6;--green:#16a34a;--dark:#111b2b;--red:#ef4444;--orange:#ff7626}
 body{background:#f4f7fc;color:var(--ink)}
 .top{position:relative;margin-left:272px;min-height:70px;padding:14px 28px;background:#1c2737;border-bottom:1px solid #273447;box-shadow:0 4px 20px #1420330a}
@@ -24,6 +24,17 @@ body{background:#f4f7fc;color:var(--ink)}
 body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #publicCatalogSection{display:none!important}body.admin-mode #foodCatalogSection{margin-top:0}body.admin-mode #foodCatalogSection .section-head h2:before{content:'🍽️';display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;margin-right:16px;background:#ff7626;color:white;border-radius:16px;font-size:26px;vertical-align:middle}body.admin-mode #foodCatalogSection .section-head{margin-bottom:15px}
 @media(max-width:850px){.foodtj-sidebar{width:78px;padding:0 8px 12px}.foodtj-side-brand{justify-content:center;padding:0;margin:0 -8px 14px;font-size:0;height:70px}.foodtj-side-brand span{display:none}.foodtj-side-brand:before{font-size:28px;content:'👨‍🍳'}.foodtj-nav a{justify-content:center;padding:13px 5px}.foodtj-nav a .nav-label{display:none}.foodtj-nav .nav-ico{font-size:22px}.foodtj-side-bottom{display:none}.top{margin-left:78px;padding:13px 16px}.wrap{margin-left:78px;padding:20px 14px 40px}#foodCatalogSection .toolbar{grid-template-columns:1fr 1fr}#foodCatalogSection .toolbar button{grid-column:1/-1}}
 @media(max-width:560px){.foodtj-sidebar{position:sticky;top:0;width:100%;height:auto;inset:auto;display:block;padding:7px;background:#111b2b}.foodtj-side-brand{display:none}.foodtj-nav{display:flex;overflow-x:auto;gap:5px}.foodtj-nav a{flex:0 0 auto;padding:10px 12px;font-size:12px}.foodtj-nav a .nav-label{display:inline}.foodtj-nav .nav-ico{font-size:16px;width:auto}.top{margin-left:0;min-height:60px;padding:12px 14px}.top>div:first-child{gap:8px;flex-wrap:wrap}.brand{font-size:22px}.top small{font-size:12px}.wrap{margin-left:0;padding:16px 11px 35px}.hero{padding:20px}.section-head h2{font-size:22px}#foodCatalogSection .toolbar{grid-template-columns:1fr}#foodCatalogSection .toolbar button{grid-column:auto}#foodCatalogGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#foodCatalogGrid .card img,#foodCatalogGrid .food-photo{height:105px}#foodCatalogGrid h3{font-size:14px}.top-actions{width:auto}.top-actions button{padding:8px 10px;font-size:12px}}
+
+#walletSection .wallet-card{background:linear-gradient(120deg,#14532d,#16a34a);color:#fff;border-radius:18px;padding:24px;max-width:680px;box-shadow:0 12px 28px #16653422}
+#walletSection .wallet-top{display:flex;align-items:center;justify-content:space-between;gap:15px}
+#walletSection .wallet-label{color:#dcfce7;font-size:14px}
+#walletSection .wallet-balance{font-size:clamp(30px,5vw,42px);font-weight:900;letter-spacing:-1px;margin-top:5px}
+#walletSection .wallet-icon{font-size:42px;background:#ffffff20;border-radius:16px;padding:12px}
+#walletSection .wallet-sub{color:#dcfce7;font-size:12px;margin-top:15px}
+#walletSection .wallet-form{margin-top:15px;max-width:900px}
+#walletSection .wallet-form h3{margin-top:0}
+#walletSection .wallet-entry{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+#walletSection .wallet-entry:last-child{border-bottom:0}
 </style>
 </head>
 <body>
@@ -33,6 +44,7 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
     <a href="#foodCatalogSection" class="active"><span class="nav-ico">⌂</span><span class="nav-label">Асосӣ</span></a>
     <a href="#foodCatalogSection"><span class="nav-ico">▦</span><span class="nav-label">Каталог</span></a>
     <a href="#myOrdersSection"><span class="nav-ico">▣</span><span class="nav-label">Фармоишҳо</span></a>
+    <a href="#walletSection"><span class="nav-ico">◈</span><span class="nav-label">Ҳамён</span></a>
     <a href="#accountPanel"><span class="nav-ico">♙</span><span class="nav-label">Истифодабарандагон</span></a>
     <a href="#adminSection"><span class="nav-ico">▥</span><span class="nav-label">Таҳлилҳо</span></a>
     <a href="#accountPanel"><span class="nav-ico">⚙</span><span class="nav-label">Танзимотҳо</span></a>
@@ -72,6 +84,32 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
     <div class="section-head"><h2>Ҳисоби ман</h2><span id="roleBadge" class="pill">муштарӣ</span></div>
     <p id="accountDetails" class="muted"></p>
     <div id="courierAvailability" class="hidden row"><button id="availabilityBtn">Фаъол кардани дастрасӣ</button><span id="availabilityText" class="muted"></span></div>
+  </section>
+
+  <section id="walletSection" class="section hidden">
+    <div class="section-head"><h2>Ҳамёни FoodTJ</h2><button class="secondary" id="walletRefresh">Навсозӣ</button></div>
+    <div class="wallet-card">
+      <div class="wallet-top"><div><div class="wallet-label">Бақияи дастрас</div><div id="walletBalance" class="wallet-balance">0.00 сомонӣ</div></div><div class="wallet-icon">◈</div></div>
+      <div class="wallet-sub">Ҳамёни шахсии FoodTJ · TJS</div>
+    </div>
+    <div class="card wallet-form">
+      <h3>Пур кардани ҳамён</h3>
+      <p class="muted">Ин ҷо аввал дархости пуркунӣ сабт мешавад. Бақия танҳо баъди тасдиқи воқеии маблағ аз ҷониби администратор зиёд мешавад.</p>
+      <div class="formgrid">
+        <div><label for="walletAmount" class="muted">Маблағ (сомонӣ)</label><input id="walletAmount" type="number" min="10" max="5000" step="0.01" placeholder="Масалан, 100"></div>
+        <div><label for="walletMethod" class="muted">Усули пардохт</label><select id="walletMethod"><option value="alif">Alif Mobi</option><option value="dushanbe_city">Dushanbe City</option><option value="eskhata">Эсхата Онлайн</option><option value="cash">Нақд ба намояндаи FoodTJ</option></select></div>
+      </div>
+      <button id="walletTopupRequest" style="margin-top:12px">Дархости пуркунӣ</button>
+      <p class="muted small">Пардохти онлайн ҳоло пайваст нашудааст. Интихоби барнома ҳоло танҳо усули дархостро нишон медиҳад; худ аз худ пул намегузаронад.</p>
+    </div>
+    <div class="card wallet-form">
+      <h3>Таърихи ҳамён</h3>
+      <div id="walletTransactions"><div class="empty">Барои дидани таърих ворид шавед.</div></div>
+    </div>
+    <div class="card wallet-form">
+      <h3>Дархостҳои пуркунӣ</h3>
+      <div id="walletTopupRequests"><div class="empty">Дархостҳо ҳоло бор нашудаанд.</div></div>
+    </div>
   </section>
 
   <section id="restaurantSection" class="section">
@@ -168,7 +206,7 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
 
 <script>
 /* ============================================================
-   FoodTJ — версияи ниҳоӣ (ҳамаи мушкилот ислоҳ шудаанд)
+   FoodTJ — версияи ниҳоӣ (пурра ислоҳшуда)
    ============================================================ */
 
 const SUPABASE_URL = 'https://rgminzzmlktkliliiupt.supabase.co';
@@ -383,7 +421,66 @@ function resetSession(){
   currentUser = null; profile = null;
   document.body.classList.remove('admin-mode');
   toggle('accountTop', false); toggle('logoutTop', false); toggle('loginTop', true);
-  ['accountPanel','myOrdersSection','courierSection','restaurantOwnerSection','adminSection'].forEach(id => toggle(id, false));
+  ['accountPanel','walletSection','myOrdersSection','courierSection','restaurantOwnerSection','adminSection'].forEach(id => toggle(id, false));
+}
+
+/* ---------- Ҳамёни FoodTJ ---------- */
+function walletMoney(value){ return Number(value || 0).toLocaleString('tg-TJ',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' сомонӣ'; }
+function walletMethodLabel(value){
+  return ({alif:'Alif Mobi',dushanbe_city:'Dushanbe City',eskhata:'Эсхата Онлайн',cash:'Нақд ба намояндаи FoodTJ'})[value] || value || '—';
+}
+async function loadWallet(){
+  if(!currentUser || !sb){
+    $('walletBalance').textContent = '0.00 сомонӣ';
+    $('walletTransactions').innerHTML = '<div class="empty">Барои дидани ҳамён аввал ворид шавед.</div>';
+    $('walletTopupRequests').innerHTML = '<div class="empty">Барои дидани дархостҳо аввал ворид шавед.</div>';
+    return;
+  }
+  $('walletBalance').textContent = 'Бор шуда истодааст...';
+  let {data:account,error:accountError} = await sb.from('foodtj_wallet_accounts').select('balance,currency').eq('user_id',currentUser.id).maybeSingle();
+  if(accountError){
+    $('walletBalance').textContent = '—';
+    $('walletTransactions').innerHTML = '<div class="empty">Ҳамён ҳоло фаъол нест. SQL-и ҳамёнро дар Supabase иҷро кунед.</div>';
+    $('walletTopupRequests').innerHTML = '<div class="empty">Ҳамён ҳоло фаъол нест. SQL-и ҳамёнро дар Supabase иҷро кунед.</div>';
+    console.warn('FoodTJ wallet tables unavailable. Run FoodTJ_wallet_setup_fixed_v2.sql in Supabase.', accountError);
+    return;
+  }
+  if(!account){
+    const {error:insErr} = await sb.from('foodtj_wallet_accounts').insert({
+      user_id: currentUser.id, balance: 0, currency: 'TJS'
+    });
+    if(insErr && insErr.code !== '23505'){
+      $('walletBalance').textContent = '—';
+      showNotice('Ҳамён сохта нашуд: ' + insErr.message + '. SQL-и навшудаи FoodTJ Wallet-ро иҷро кунед.','error');
+      return;
+    }
+    const {data:createdAccount,error:reloadError} = await sb.from('foodtj_wallet_accounts').select('balance,currency').eq('user_id',currentUser.id).maybeSingle();
+    if(reloadError || !createdAccount){
+      $('walletBalance').textContent = '—';
+      showNotice('Ҳамён сохта шуданаш тасдиқ нашуд. Бори дигар саҳифаро нав кунед.','error');
+      return;
+    }
+    account = createdAccount;
+  }
+  $('walletBalance').textContent = walletMoney(account?.balance || 0);
+  const {data:tx,error:txError} = await sb.from('foodtj_wallet_transactions').select('id,transaction_type,amount,status,description,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(20);
+  $('walletTransactions').innerHTML = txError ? '<div class="empty">Таърих бор нашуд.</div>' : (tx||[]).length ? tx.map(t=>`<div class="wallet-entry"><div><strong>${esc(t.description || (t.transaction_type==='topup'?'Пуркунӣ':'Амалиёт'))}</strong><div class="muted small">${esc(t.status)} · ${new Date(t.created_at).toLocaleString('tg-TJ')}</div></div><strong>${t.transaction_type==='topup'?'+':'−'}${walletMoney(t.amount)}</strong></div>`).join('') : '<div class="empty">Ҳоло амалиёт нест.</div>';
+  const {data:req,error:reqError} = await sb.from('foodtj_wallet_topup_requests').select('id,amount,method,status,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(10);
+  $('walletTopupRequests').innerHTML = reqError ? '<div class="empty">Дархостҳо бор нашуданд.</div>' : (req||[]).length ? req.map(r=>`<div class="wallet-entry"><div><strong>${walletMoney(r.amount)} · ${esc(walletMethodLabel(r.method))}</strong><div class="muted small">${new Date(r.created_at).toLocaleString('tg-TJ')}</div></div><span class="pill ${r.status==='approved'?'':'gray'}">${esc(({pending:'Дар интизорӣ',approved:'Тасдиқ шуд',rejected:'Рад шуд'})[r.status]||r.status)}</span></div>`).join('') : '<div class="empty">Ҳоло дархости пуркунӣ нест.</div>';
+}
+async function requestWalletTopup(){
+  if(!requireLogin()) return;
+  const amount=Number($('walletAmount').value);
+  if(!Number.isFinite(amount) || amount<10 || amount>5000){ showNotice('Маблағ бояд аз 10 то 5000 сомонӣ бошад.','error'); return; }
+  const btn=$('walletTopupRequest'); setBusy(btn,true,'Дархост фиристода мешавад...');
+  try{
+    const {error}=await sb.from('foodtj_wallet_topup_requests').insert({user_id:currentUser.id,amount:moneyNumber(amount),method:$('walletMethod').value});
+    if(error) throw error;
+    $('walletAmount').value='';
+    showNotice('Дархости пуркунӣ сабт шуд. Бақия танҳо баъди тасдиқи администратор зиёд мешавад.','success');
+    await loadWallet();
+  }catch(e){showNotice('Дархост сабт нашуд: '+(e.message||e)+'. Аввал SQL-и ҳамёнро дар Supabase иҷро кунед.','error');}
+  finally{setBusy(btn,false);}
 }
 
 /* ---------- Профил ---------- */
@@ -418,6 +515,14 @@ async function loadProfile(user){
   toggle('courierSection', role === 'courier');
   toggle('restaurantOwnerSection', role === 'restaurant');
   toggle('adminSection', role === 'admin');
+  try {
+    await loadWallet();
+  } catch (walletErr) {
+    console.warn('Wallet error (non-critical):', walletErr);
+    if ($('walletBalance')) $('walletBalance').textContent = '—';
+    if ($('walletTransactions')) $('walletTransactions').innerHTML = '<div class="empty">Ҳамён ҳоло дастрас нест.</div>';
+    if ($('walletTopupRequests')) $('walletTopupRequests').innerHTML = '<div class="empty">Ҳамён ҳоло дастрас нест.</div>';
+  }
   if(role === 'customer' || role === 'admin') await loadMyOrders();
   if(role === 'courier') await loadCourierOrders();
   if(role === 'restaurant') await loadOwnerPanel();
@@ -503,14 +608,15 @@ function updateCart(){
 /* ---------- Фармоишҳои ман ---------- */
 async function loadMyOrders(){
   if(!currentUser) return;
-  const { data, error } = await sb.from('orders').select('id,restaurant_id,status,subtotal,delivery_fee,total,created_at,delivery_address').eq('customer_id', currentUser.id).order('created_at', {ascending:false}).limit(30);
+  const { data, error } = await sb.from('orders').select('id,restaurant_id,status,subtotal,service_fee,delivery_fee,total,created_at,delivery_address').eq('customer_id', currentUser.id).order('created_at', {ascending:false}).limit(30);
   if(error){ $('myOrders').innerHTML = '<div class="empty">Фармоишҳо бор нашуданд: ' + esc(error.message) + '</div>'; return; }
   if(!data?.length){ $('myOrders').innerHTML = '<div class="empty">Шумо ҳоло фармоиш надоред.</div>'; return; }
   $('myOrders').innerHTML = data.map(o => `
     <article class="card order-card">
       <div class="section-head"><strong>Фармоиш #${esc(String(o.id).slice(0,8))}</strong><span class="pill">${esc(statusNames[o.status] || o.status)}</span></div>
       <p class="muted">${new Date(o.created_at).toLocaleString('tg-TJ')} • ${esc(o.delivery_address || '')}</p>
-      <strong>${money(o.total)}</strong>
+      <p class="muted">Хӯрок: ${money(o.subtotal || 0)} + ҳаққи хизматрасонӣ: ${money(o.service_fee || 0)} + расонидан: ${money(o.delivery_fee || 0)}</p>
+      <strong>Ҳамагӣ: ${money(o.total)}</strong>
     </article>
   `).join('');
 }
@@ -692,8 +798,10 @@ $('toggleSignup').onclick = () => {
 $('authSubmit').onclick = signInOrUp;
 $('logoutTop').onclick = async () => { if(sb) await sb.auth.signOut(); resetSession(); showNotice('Шумо аз ҳисоб баромадед.', 'success'); };
 $('accountTop').onclick = () => { toggle('accountPanel', true); $('accountPanel').scrollIntoView({behavior:'smooth'}); };
+$('walletRefresh').onclick = loadWallet;
+$('walletTopupRequest').onclick = requestWalletTopup;
 
-/* ---------- Sidebar навигатсия (ТАНҲО ЯК LISTENER) ---------- */
+/* ---------- Sidebar навигатсия (як listener) ---------- */
 document.querySelectorAll('.foodtj-nav a').forEach(link => {
   link.addEventListener('click', (e) => {
     const href = link.getAttribute('href') || '';
@@ -722,6 +830,13 @@ document.querySelectorAll('.foodtj-nav a').forEach(link => {
     if (targetId === 'restaurantOwnerSection' && role !== 'restaurant') {
       e.preventDefault();
       showNotice('Ин бахш танҳо барои ресторан аст.', 'error');
+      return;
+    }
+    if (targetId === 'walletSection' && !currentUser) {
+      e.preventDefault();
+      toggle('authPanel', true);
+      $('authPanel')?.scrollIntoView({behavior:'smooth', block:'start'});
+      showNotice('Барои истифодаи ҳамён аввал ворид шавед.', 'error');
       return;
     }
     if (targetId === 'accountPanel' && !currentUser) {
