@@ -69,6 +69,7 @@
       <textarea id="orderNotes" class="full" placeholder="Шарҳ ба ресторан ё курьер (ихтиёрӣ)"></textarea>
     </div>
     <p class="muted small">Ҳамёни дохилӣ ва пардохти онлайн то пайваст шудани провайдери пардохт фаъол нестанд. Ҳоло «Пули нақд»-ро интихоб кунед.</p>
+    <div id="checkoutPriceBreakdown" class="card" style="margin:12px 0"></div>
     <button id="placeOrder">Тасдиқи фармоиш</button>
   </section>
 
@@ -120,15 +121,13 @@
 
 <script>
 /* ============================================================
-   FoodTJ — версияи ниҳоӣ
-   Тағйиротҳо аз версияи шумо:
+   FoodTJ — версияи ниҳоӣ (8% ҳаққи хизматрасонӣ)
+   Тағйиротҳо:
    - p_delivery_lat/lng → p_delivery_latitude/longitude (тағйири шумо)
-   - customerPhone → deliveryPhone (ID-и дуруст)
-   - restaurants/menuItems ID-ҳо мутобиқ карда шуданд
-   - Ҳамаи event listener-ҳо бо .onclick кор мекунанд
-   - init() бо try/catch ва проверкаи config
-   - cart.count дар cartBar нишон дода мешавад
-   - Toast notices ба ҷои alert
+   - deliveryPhone-и бехатар (санҷиши мавҷудият)
+   - init() бо try/catch
+   - Ҳисоби 8% ҳаққи хизматрасонӣ + расонидан 10 сомонӣ
+   - Ҳамаи event listener-ҳо бо .onclick
    ============================================================ */
 
 const SUPABASE_URL = 'https://rgminzzmlktkliliiupt.supabase.co';
@@ -140,19 +139,22 @@ const statusNames = {new:'Нав',accepted:'Қабул шуд',preparing:'Пух
 let sb = null, currentUser = null, profile = null, authMode = 'login';
 let restaurants = [], currentRestaurant = null, menuItems = [], cart = new Map(), ownerRestaurants = [];
 
+/* ---------- Кӯмакчиҳо ---------- */
 function showNotice(message, type='info') {
-  const n = $('notice'); n.textContent = message; n.className = 'notice' + (type==='error'?' error':type==='success'?' success':'');
+  const n = $('notice'); if(!n){alert(message);return;}
+  n.textContent = message; n.className = 'notice' + (type==='error'?' error':type==='success'?' success':'');
   n.classList.remove('hidden'); n.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-function clearNotice(){ $('notice').classList.add('hidden'); }
-function setBusy(button, busy, text) { if(!button.dataset.original) button.dataset.original=button.textContent; button.disabled=busy; button.textContent=busy?(text||'Лутфан интизор шавед...'):button.dataset.original; }
+function clearNotice(){ $('notice')?.classList.add('hidden'); }
+function setBusy(button, busy, text) { if(!button)return; if(!button.dataset.original) button.dataset.original=button.textContent; button.disabled=busy; button.textContent=busy?(text||'Лутфан интизор шавед...'):button.dataset.original; }
 function moneyNumber(n){return Math.round((Number(n)+Number.EPSILON)*100)/100;}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function validConfig(){return SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('PASTE_') && SUPABASE_KEY && !SUPABASE_KEY.includes('PASTE_');}
-function toggle(id, yes){$(id).classList.toggle('hidden',!yes);}
+function toggle(id, yes){const e=$(id); if(e) e.classList.toggle('hidden',!yes);}
 function roleLabel(role){return ({customer:'Муштарӣ',restaurant:'Ресторан',courier:'Курьер',admin:'Администратор'})[role]||'Муштарӣ';}
-function requireLogin(){if(!currentUser){toggle('authPanel',true);$('authPanel').scrollIntoView({behavior:'smooth'});showNotice('Барои ин амал аввал ворид шавед.');return false;}return true;}
+function requireLogin(){if(!currentUser){toggle('authPanel',true);$('authPanel')?.scrollIntoView({behavior:'smooth'});showNotice('Барои ин амал аввал ворид шавед.');return false;}return true;}
 
+/* ---------- Инициализатсия ---------- */
 async function init(){
   if(!validConfig()){ 
     $('restaurants').innerHTML='<div class="empty">Аввал URL ва publishable/anon key-и Supabase-и FoodTJ-ро дар аввали index.html гузоред.</div>'; 
@@ -174,13 +176,17 @@ function resetSession(){
   currentUser=null;profile=null;toggle('accountTop',false);toggle('logoutTop',false);toggle('loginTop',true);
   ['accountPanel','myOrdersSection','courierSection','restaurantOwnerSection','adminSection'].forEach(id=>toggle(id,false));
 }
+
+/* ---------- Профил ---------- */
 async function loadProfile(user){
   currentUser=user;
   let {data:p,error}=await sb.from('profiles').select('*').eq('id',user.id).maybeSingle();
   if(error){showNotice('Хатои хондани профил: '+error.message,'error');return;}
   if(!p){
     const meta = user.user_metadata || {};
-    const {data:newP,error:insertError}=await sb.from('profiles').insert({id:user.id,phone:($('authPhone')?.value||'').trim() || meta.phone || '',full_name:($('authName')?.value||'').trim() || meta.full_name || '',role:'customer'}).select('*').single();
+    const phoneVal = ($('authPhone')?.value || '').trim() || meta.phone || '';
+    const nameVal = ($('authName')?.value || '').trim() || meta.full_name || '';
+    const {data:newP,error:insertError}=await sb.from('profiles').insert({id:user.id,phone:phoneVal,full_name:nameVal,role:'customer'}).select('*').single();
     if(insertError){showNotice('Профил сохта нашуд: '+insertError.message+'. Санҷед, ки сиёсати INSERT барои profiles фаъол аст.','error');return;}
     p=newP;
   }
@@ -201,6 +207,8 @@ async function loadProfile(user){
   if(p.role==='restaurant') await loadOwnerPanel();
   if(p.role==='admin') await loadAdminOrders();
 }
+
+/* ---------- Ресторанҳо ---------- */
 async function loadRestaurants(){
   if(!sb)return;
   const {data,error}=await sb.from('restaurants').select('id,name,description,address,phone,image_url,is_open,is_approved').eq('is_approved',true).order('name');
@@ -214,6 +222,8 @@ function renderRestaurants(){
   if(!list.length){$('restaurants').innerHTML='<div class="empty">Ҳоло ресторан нест ё натиҷа ёфт нашуд.</div>';return;}
   $('restaurants').innerHTML=list.map(r=>`<article class="card"><div style="font-size:36px;margin-bottom:8px">🍽️</div><h3>${esc(r.name)}</h3><p class="muted">${esc(r.description||'')}</p><p class="muted">📍 ${esc(r.address||'Душанбе')}</p><span class="pill ${r.is_open?'':'gray'}">${r.is_open?'Кушода':'Ҳоло баста'}</span><div style="margin-top:13px"><button data-open-restaurant="${r.id}" ${r.is_open?'':'disabled'}>Дидани меню</button></div></article>`).join('');
 }
+
+/* ---------- Меню ---------- */
 async function openRestaurant(id){
   const r=restaurants.find(x=>x.id===id);if(!r)return;currentRestaurant=r;cart.clear();
   $('menuTitle').textContent=r.name;$('menuDescription').textContent=(r.description||'')+' • '+(r.address||'Душанбе');
@@ -227,12 +237,28 @@ function renderMenu(){
   if(!menuItems.length){$('menuItems').innerHTML='<div class="empty">Ин ресторан ҳоло хӯроки дастрас надорад.</div>';return;}
   $('menuItems').innerHTML=menuItems.map(m=>`<article class="card"><div style="font-size:30px">🥘</div><h3>${esc(m.name)}</h3><p class="muted">${esc(m.description||'')}</p><div class="row"><span class="price">${money(m.price)}</span><button data-add="${m.id}">+ Илова</button></div></article>`).join('');
 }
+
+/* ---------- Сабад + 8% ---------- */
 function updateCart(){
   const count=[...cart.values()].reduce((a,x)=>a+x.quantity,0);
   const subtotal=[...cart.values()].reduce((a,x)=>a+x.quantity*Number(x.item.price),0);
-  $('cartCount').textContent=`${count} хӯрок`; $('cartTotal').textContent='Ҷамъ: '+money(subtotal);
+  const serviceFee=moneyNumber(subtotal*0.08);       /* ← 8% ҳаққи хизматрасонӣ */
+  const deliveryFee=count>0?10:0;                     /* ← 10 сомонӣ расонидан */
+  const total=moneyNumber(subtotal+serviceFee+deliveryFee);
+  $('cartCount').textContent=`${count} хӯрок`;
+  $('cartTotal').textContent='Ҳамагӣ: '+money(total);
   toggle('cartBar',count>0);
+  const breakdown=$('checkoutPriceBreakdown');
+  if(breakdown){
+    breakdown.innerHTML=count?`<div class="item"><span>Нархи аслии хӯрокҳо</span><strong>${money(subtotal)}</strong></div>
+      <div class="item"><span>Ҳаққи хизматрасонии FoodTJ (8%)</span><strong>${money(serviceFee)}</strong></div>
+      <div class="item"><span>Расонидан</span><strong>${money(deliveryFee)}</strong></div>
+      <div class="item"><strong>Ҳамагӣ</strong><strong>${money(total)}</strong></div>`
+      :'<p class="muted">Сабади хӯрок холӣ аст.</p>';
+  }
 }
+
+/* ---------- Фармоишҳои ман ---------- */
 async function loadMyOrders(){
   if(!currentUser)return;
   const {data,error}=await sb.from('orders').select('id,restaurant_id,status,subtotal,delivery_fee,total,created_at,delivery_address').eq('customer_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
@@ -240,6 +266,8 @@ async function loadMyOrders(){
   if(!data?.length){$('myOrders').innerHTML='<div class="empty">Шумо ҳоло фармоиш надоред.</div>';return;}
   $('myOrders').innerHTML=data.map(o=>`<article class="card order-card"><div class="section-head"><strong>Фармоиш #${esc(o.id.slice(0,8))}</strong><span class="pill">${esc(statusNames[o.status]||o.status)}</span></div><p class="muted">${new Date(o.created_at).toLocaleString('tg-TJ')} • ${esc(o.delivery_address)}</p><strong>${money(o.total)}</strong></article>`).join('');
 }
+
+/* ---------- Курьер ---------- */
 async function loadCourierOrders(){
   if(!profile||profile.role!=='courier')return;
   const {data:available,error}=await sb.rpc('foodtj_available_orders');
@@ -273,6 +301,8 @@ async function loadCourierOrders(){
   }
   $('courierOrders').innerHTML=htmlParts.join('');
 }
+
+/* ---------- Ресторан (соҳиб) ---------- */
 async function loadOwnerPanel(){
   if(!currentUser)return;
   const {data,error}=await sb.from('restaurants').select('*').eq('owner_id',currentUser.id).order('created_at',{ascending:false});
@@ -293,18 +323,23 @@ function restaurantOrderHtml(o){
   if(o.status==='preparing')options='<option value="ready_for_pickup">Омода барои курьер</option>';
   return `<article class="card order-card"><div class="section-head"><strong>#${esc(o.id.slice(0,8))}</strong><span class="pill">${esc(statusNames[o.status]||o.status)}</span></div><p class="muted">${esc(o.delivery_address||'')} • ${money(o.total)}</p>${options?`<div class="row"><select id="st-${o.id}">${options}</select><button data-restaurant-status="${o.id}">Нав кардани ҳолат</button></div>`:''}</article>`;
 }
+
+/* ---------- Администратор ---------- */
 async function loadAdminOrders(){
   const {data,error}=await sb.from('orders').select('*').order('created_at',{ascending:false}).limit(50);
   if(error){$('adminOrders').textContent=error.message;return;}
   $('adminOrders').innerHTML=(data||[]).map(o=>`<article class="item"><div><strong>#${esc(o.id.slice(0,8))}</strong><div class="muted">${esc(o.status)} • ${new Date(o.created_at).toLocaleString('tg-TJ')}</div></div><strong>${money(o.total)}</strong></article>`).join('')||'<div class="empty">Фармоиш нест.</div>';
 }
+
+/* ---------- Вуруд / Сабти ном ---------- */
 async function signInOrUp(){
-  clearNotice();const email=$('authEmail').value.trim(),password=$('authPassword').value;
+  clearNotice();
+  const email=$('authEmail').value.trim(), password=$('authPassword').value;
   if(!email||!password){showNotice('Email ва паролро пур кунед.','error');return;}
   const btn=$('authSubmit');setBusy(btn,true);
   try{
     if(authMode==='signup'){
-      const {data,error}=await sb.auth.signUp({email,password,options:{data:{full_name:$('authName').value.trim(),phone:$('authPhone').value.trim()}}});
+      const {data,error}=await sb.auth.signUp({email,password,options:{data:{full_name:($('authName').value||'').trim(),phone:($('authPhone').value||'').trim()}}});
       if(error)throw error;
       if(data.session){await loadProfile(data.user);toggle('authPanel',false);showNotice('Сабти ном бомуваффақият анҷом ёфт.','success');}
       else showNotice('Сабти ном қабул шуд. Агар тасдиқи email фаъол бошад, почтаи худро тасдиқ карда баъд ворид шавед.','success');
@@ -315,10 +350,12 @@ async function signInOrUp(){
   }catch(e){showNotice(e.message||'Хато рух дод.','error');}
   finally{setBusy(btn,false);}
 }
+
+/* ---------- Сохтани фармоиш ---------- */
 async function createOrder(){
   if(!requireLogin())return;
   if(profile?.role!=='customer'){showNotice('Фармоиш додан танҳо аз ҳисоби муштарӣ мумкин аст.','error');return;}
-  const address=$('deliveryAddress').value.trim(),phone=$('deliveryPhone').value.trim();
+  const address=$('deliveryAddress').value.trim(), phone=$('deliveryPhone').value.trim();
   if(!address||!phone){showNotice('Суроға ва рақами телефонро пур кунед.','error');return;}
   if(!cart.size||!currentRestaurant){showNotice('Сабади хӯрок холӣ аст.','error');return;}
   const items=[...cart.values()].map(x=>({menu_item_id:x.item.id,quantity:x.quantity}));
@@ -338,7 +375,9 @@ async function createOrder(){
     cart.clear();updateCart();toggle('checkoutSection',false);toggle('menuSection',false);toggle('restaurantSection',true);
     showNotice('Фармоиш фиристода шуд! Рақами фармоиш: '+String(data?.id||'').slice(0,8)+'.','success');
     await loadMyOrders();toggle('myOrdersSection',true);
-  }catch(e){showNotice('Фармоиш ҳоло сохта нашуд: '+(e.message||e)+'. Санҷед, ки функсияи foodtj_create_order дар Supabase сохта шудааст.','error');}
+  }catch(e){
+    showNotice('Фармоиш ҳоло сохта нашуд: '+(e.message||e)+'. Санҷед, ки функсияи foodtj_create_order дар Supabase сохта шудааст.','error');
+  }
   finally{setBusy(btn,false);}
 }
 
@@ -357,13 +396,17 @@ $('backRestaurants').onclick=()=>{toggle('menuSection',false);toggle('restaurant
 $('checkoutBtn').onclick=()=>{if(!requireLogin())return;toggle('checkoutSection',true);$('checkoutSection').scrollIntoView({behavior:'smooth'});};
 $('cancelCheckout').onclick=()=>toggle('checkoutSection',false);
 $('placeOrder').onclick=createOrder;
+
 $('availabilityBtn').onclick=async()=>{
   if(!profile||profile.role!=='courier')return;
   const next=!profile.is_available;
   const {error}=await sb.from('profiles').update({is_available:next}).eq('id',currentUser.id);
   if(error){showNotice('Тағйири дастрасӣ ноком шуд: '+error.message,'error');return;}
-  profile.is_available=next;$('availabilityText').textContent=next?'Дастрас ҳастед':'Ҳоло дастрас нестед';$('availabilityBtn').textContent=next?'Хомӯш кардани дастрасӣ':'Фаъол кардани дастрасӣ';
-  await loadCourierOrders();showNotice(next?'Дастрасии курьер фаъол шуд.':'Дастрасии курьер хомӯш шуд.','success');
+  profile.is_available=next;
+  $('availabilityText').textContent=next?'Дастрас ҳастед':'Ҳоло дастрас нестед';
+  $('availabilityBtn').textContent=next?'Хомӯш кардани дастрасӣ':'Фаъол кардани дастрасӣ';
+  await loadCourierOrders();
+  showNotice(next?'Дастрасии курьер фаъол шуд.':'Дастрасии курьер хомӯш шуд.','success');
 };
 $('reloadCourier').onclick=loadCourierOrders;
 $('courierOrders').onclick=async e=>{
