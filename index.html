@@ -562,3 +562,306 @@ function escapeHTML(value) {
   })[char]);
 }
 </script>
+<script>
+async function createOrder() {
+  if (!currentUser) {
+    showMessage('Барои фармоиш аввал ба аккаунт ворид шав.');
+    return;
+  }
+
+  if (!selectedRestaurant || cart.length === 0) {
+    showMessage('Аввал тарабхона ва хӯрокро интихоб кун.');
+    return;
+  }
+
+  const address = el('deliveryAddress')?.value.trim();
+  const phone = el('customerPhone')?.value.trim();
+  const notes = el('orderNotes')?.value.trim();
+
+  if (!address || !phone) {
+    showMessage('Суроға ва рақами телефонро пур кун.');
+    return;
+  }
+
+  const items = cart.map(item => ({
+    menu_item_id: item.id,
+    quantity: item.quantity
+  }));
+
+  const { data, error } = await sb.rpc('foodtj_create_order', {
+    p_restaurant_id: selectedRestaurant,
+    p_delivery_address: address,
+    p_customer_phone: phone,
+    p_delivery_lat: null,
+    p_delivery_lng: null,
+    p_payment_method: 'cash',
+    p_notes: notes || null,
+    p_items: items
+  });
+
+  if (error) {
+    showMessage('Фармоиш қабул нашуд: ' + error.message);
+    return;
+  }
+
+  cart = [];
+  renderCart();
+
+  showMessage('Фармоиш сабт шуд!');
+  await loadMyOrders();
+}
+
+async function loadMyOrders() {
+  const container = el('myOrders');
+  if (!container || !currentUser) return;
+
+  const { data, error } = await sb
+    .from('orders')
+    .select('id,status,delivery_address,total,payment_method,created_at')
+    .eq('customer_id', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    container.innerHTML = '<p>Фармоишҳоро бор карда нашуд.</p>';
+    console.error(error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    container.innerHTML = '<p>Ҳоло фармоиш надорӣ.</p>';
+    return;
+  }
+
+  container.innerHTML = data.map(order => `
+    <article class="order-card">
+      <p><strong>Фармоиш:</strong> ${escapeHTML(order.id)}</p>
+      <p><strong>Ҳолат:</strong> ${escapeHTML(order.status)}</p>
+      <p><strong>Суроға:</strong> ${escapeHTML(order.delivery_address)}</p>
+      <p><strong>Ҳамагӣ:</strong> ${Number(order.total).toFixed(2)} сомонӣ</p>
+      <p><strong>Пардохт:</strong> ${escapeHTML(order.payment_method)}</p>
+    </article>
+  `).join('');
+}
+
+async function loadCourierOrders() {
+  if (!currentUser || currentProfile?.role !== 'courier') {
+    showMessage('Ин бахш танҳо барои курьер аст.');
+    return;
+  }
+
+  const container = el('courierOrders');
+  if (!container) return;
+
+  container.innerHTML = '<p>Фармоишҳо бор шуда истодаанд...</p>';
+
+  const { data: available, error: availableError } = await sb
+    .rpc('foodtj_available_orders');
+
+  if (availableError) {
+    container.innerHTML = '<p>Хатои боркунии фармоишҳои дастрас.</p>';
+    console.error(availableError);
+    return;
+  }
+
+  const { data: assigned, error: assignedError } = await sb
+    .from('orders')
+    .select('id,status,delivery_address,customer_phone,total,created_at')
+    .eq('courier_id', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  if (assignedError) {
+    console.error(assignedError);
+  }
+
+  const availableHTML = (available || []).map(order => `
+    <article class="order-card">
+      <h3>Фармоиши дастрас</h3>
+      <p>№ ${escapeHTML(order.id)}</p>
+      <p>Суроға: ${escapeHTML(order.delivery_address || '')}</p>
+      <p>Ҳамагӣ: ${Number(order.total || 0).toFixed(2)} сомонӣ</p>
+      <button onclick="claimOrder('${order.id}')">
+        Қабул кардани фармоиш
+      </button>
+    </article>
+  `).join('');
+
+  const assignedHTML = (assigned || []).map(order => `
+    <article class="order-card">
+      <h3>Фармоиши ман</h3>
+      <p>№ ${escapeHTML(order.id)}</p>
+      <p>Ҳолат: ${escapeHTML(order.status)}</p>
+      <p>Суроға: ${escapeHTML(order.delivery_address || '')}</p>
+      <p>Телефон: ${escapeHTML(order.customer_phone || '')}</p>
+
+      ${order.status === 'ready_for_pickup' ? `
+        <button onclick="updateCourierStatus('${order.id}','picked_up')">
+          Хӯрокро гирифтам
+        </button>
+      ` : ''}
+
+      ${order.status === 'picked_up' ? `
+        <button onclick="updateCourierStatus('${order.id}','delivering')">
+          Ба роҳ баромадам
+        </button>
+      ` : ''}
+
+      ${order.status === 'delivering' ? `
+        <button onclick="updateCourierStatus('${order.id}','delivered')">
+          Фармоиш расонида шуд
+        </button>
+      ` : ''}
+    </article>
+  `).join('');
+
+  container.innerHTML =
+    '<h3>Фармоишҳои дастрас</h3>' +
+    (availableHTML || '<p>Ҳоло фармоиши дастрас нест.</p>') +
+    '<h3>Фармоишҳои ман</h3>' +
+    (assignedHTML || '<p>Ҳоло фармоиши таъиншуда надорӣ.</p>');
+}
+
+async function claimOrder(orderId) {
+  if (!currentUser || currentProfile?.role !== 'courier') {
+    showMessage('Аввал бо аккаунти курьер ворид шав.');
+    return;
+  }
+
+  const { error } = await sb.rpc('foodtj_claim_order', {
+    p_order_id: orderId
+  });
+
+  if (error) {
+    showMessage('Қабул нашуд. Эҳтимол курьери дигар фармоишро гирифтааст.');
+    console.error(error);
+    return;
+  }
+
+  showMessage('Фармоиш ба ту таъин шуд.');
+  await loadCourierOrders();
+}
+
+async function updateCourierStatus(orderId, newStatus) {
+  const { error } = await sb.rpc('foodtj_courier_update_order_status', {
+    p_order_id: orderId,
+    p_new_status: newStatus
+  });
+
+  if (error) {
+    showMessage('Ҳолат тағйир дода нашуд: ' + error.message);
+    return;
+  }
+
+  showMessage('Ҳолати фармоиш нав шуд.');
+  await loadCourierOrders();
+  await loadMyOrders();
+}
+
+async function loadRestaurantOrders() {
+  if (!currentUser || currentProfile?.role !== 'restaurant') {
+    showMessage('Ин бахш танҳо барои аккаунти тарабхона аст.');
+    return;
+  }
+
+  const container = el('restaurantOrders');
+  if (!container) return;
+
+  const { data: restaurants, error: restaurantError } = await sb
+    .from('restaurants')
+    .select('id,name')
+    .eq('owner_id', currentUser.id);
+
+  if (restaurantError) {
+    container.innerHTML = '<p>Хатои боркунии тарабхонаҳо.</p>';
+    return;
+  }
+
+  if (!restaurants || restaurants.length === 0) {
+    container.innerHTML = '<p>Ба ин аккаунт тарабхона пайваст нест.</p>';
+    return;
+  }
+
+  const ids = restaurants.map(r => r.id);
+
+  const { data: orders, error } = await sb
+    .from('orders')
+    .select('id,restaurant_id,status,delivery_address,total,created_at')
+    .in('restaurant_id', ids)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    container.innerHTML = '<p>Фармоишҳоро бор карда нашуд.</p>';
+    console.error(error);
+    return;
+  }
+
+  container.innerHTML = (orders || []).map(order => `
+    <article class="order-card">
+      <p>Фармоиш: ${escapeHTML(order.id)}</p>
+      <p>Ҳолат: ${escapeHTML(order.status)}</p>
+      <p>Суроға: ${escapeHTML(order.delivery_address || '')}</p>
+      <p>Ҳамагӣ: ${Number(order.total).toFixed(2)} сомонӣ</p>
+
+      ${order.status === 'new' ? `
+        <button onclick="updateRestaurantStatus('${order.id}','accepted')">
+          Қабул кардан
+        </button>
+        <button onclick="updateRestaurantStatus('${order.id}','cancelled')">
+          Рад кардан
+        </button>
+      ` : ''}
+
+      ${order.status === 'accepted' ? `
+        <button onclick="updateRestaurantStatus('${order.id}','preparing')">
+          Омода кардани хӯрок
+        </button>
+      ` : ''}
+
+      ${order.status === 'preparing' ? `
+        <button onclick="updateRestaurantStatus('${order.id}','ready_for_pickup')">
+          Хӯрок тайёр аст
+        </button>
+      ` : ''}
+    </article>
+  `).join('') || '<p>Ҳоло фармоиш нест.</p>';
+}
+
+async function updateRestaurantStatus(orderId, newStatus) {
+  const { error } = await sb.rpc(
+    'foodtj_restaurant_update_order_status',
+    {
+      p_order_id: orderId,
+      p_new_status: newStatus
+    }
+  );
+
+  if (error) {
+    showMessage('Ҳолат тағйир дода нашуд: ' + error.message);
+    return;
+  }
+
+  showMessage('Ҳолати фармоиш нав шуд.');
+  await loadRestaurantOrders();
+}
+
+async function initFoodTJ() {
+  await loadAccount();
+
+  await loadRestaurants();
+
+  if (currentUser) {
+    await loadMyOrders();
+
+    if (currentProfile?.role === 'courier') {
+      await loadCourierOrders();
+    }
+
+    if (currentProfile?.role === 'restaurant') {
+      await loadRestaurantOrders();
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initFoodTJ().catch(console.error);
+});
+</script>
