@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FoodTJ — Super Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg:#0c121b;
+  --panel:#172230;
+  --border:#334155;
+  --orange:#ff842e;
+  --text:#f5f7fa;
+  --muted:#aab8c7;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+header{background:var(--panel);padding:22px;text-align:center;border-bottom:1px solid var(--border)}
+h1{margin:0;color:var(--orange)}
+main{max-width:1050px;margin:20px auto;padding:15px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:18px}
+button,input,select{font:inherit;padding:11px;border-radius:9px}
+button{background:var(--orange);color:#111;border:0;font-weight:bold;cursor:pointer;margin:4px}
+button:disabled{opacity:.5;cursor:not-allowed}
+input,select{background:#0d1722;border:1px solid #475569;color:white;width:100%;margin:7px 0}
+.item{border-bottom:1px solid var(--border);padding:14px 0;overflow-wrap:anywhere}
+.danger{background:#ef4444;color:white}
+.secondary{background:#475569;color:white}
+.muted{color:var(--muted)}
+.error{color:#fb7185}
+.success{color:#4ade80}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{background:#0e1925;padding:18px;border-radius:12px}
+.stat strong{font-size:26px;display:block;margin-top:8px}
+a{color:#ffb078}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<header>
+<h1>FoodTJ — Super Admin</h1>
+<p>Панели идоракунии дархостҳои нақш</p>
+<a href="./index.html">Саҳифаи асосӣ</a>
+</header>
+
+<main>
+<section class="card">
+<h2>Воридшавии администратор</h2>
+<p id="accountInfo">Санҷиши ҳисоб...</p>
+
+<div id="loginForm">
+<input id="email" type="email" placeholder="Email" autocomplete="email">
+<input id="password" type="password" placeholder="Парол" autocomplete="current-password">
+<button id="loginBtn">Ворид шудан</button>
+</div>
+
+<button id="logoutBtn" class="secondary" hidden>Баромадан</button>
+</section>
+
+<div id="adminPanel" hidden>
+<section class="card">
+<h2>Омор</h2>
+<div class="stats">
+<div class="stat">Ҳамаи дархостҳо<strong id="totalCount">0</strong></div>
+<div class="stat">Интизорӣ<strong id="pendingCount">0</strong></div>
+<div class="stat">Тасдиқшуда<strong id="approvedCount">0</strong></div>
+<div class="stat">Радшуда<strong id="rejectedCount">0</strong></div>
+</div>
+<p class="muted">Омор аз 500 дархости охир ҳисоб мешавад.</p>
+</section>
+
+<section class="card">
+<h2>Дархостҳои корбарон</h2>
+<select id="filter">
+<option value="pending">Интизорӣ</option>
+<option value="approved">Тасдиқшуда</option>
+<option value="rejected">Радшуда</option>
+<option value="all">Ҳама</option>
+</select>
+<button id="refreshBtn" class="secondary">Навсозӣ</button>
+<div id="requests"></div>
+</section>
+</div>
+
+<p id="message" role="status"></p>
+</main>
+
+<script>
+"use strict";
+
+// ====================================
+// SUPABASE — КАЛИД ГУЗОШТА ШУД
+// ====================================
+
+const SUPABASE_URL =
+  "https://rgminzzmlktkliliiupt.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_UHJzsYIpimmjtDtHEnacQA_BJVKE2pD";
+
+const $ = id => document.getElementById(id);
+
+const sb = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+let currentUser = null;
+let isSuperAdmin = false;
+let allRequests = [];
+
+function msg(text,error=false) {
+  $("message").textContent=text;
+  $("message").className=error?"error":"success";
+}
+
+function esc(value) {
+  return String(value??"").replace(/[&<>"']/g,c=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[c]));
+}
+
+function roleName(role) {
+  return ({
+    courier:"Курьер",
+    restaurant:"Соҳиби ресторан"
+  })[role]||role;
+}
+
+function statusName(status) {
+  return ({
+    pending:"Интизорӣ",
+    approved:"Тасдиқшуда",
+    rejected:"Радшуда"
+  })[status]||status;
+}
+
+function dateName(value) {
+  if(!value)return "";
+  const d=new Date(value);
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleString("tg-TJ");
+}
+
+// ====================================
+// AUTH
+// ====================================
+
+async function checkSession() {
+  const {data,error}=await sb.auth.getUser();
+
+  currentUser=data?.user||null;
+
+  $("loginForm").hidden=!!currentUser;
+  $("logoutBtn").hidden=!currentUser;
+  $("adminPanel").hidden=true;
+
+  if(!currentUser) {
+    $("accountInfo").textContent="Ворид нашудаед.";
+    isSuperAdmin=false;
+    if(error)msg(error.message,true);
+    return;
+  }
+
+  $("accountInfo").textContent=
+    currentUser.email||currentUser.id;
+
+  const adminResult=await sb.rpc("is_super_admin");
+
+  isSuperAdmin=
+    !adminResult.error&&adminResult.data===true;
+
+  if(adminResult.error) {
+    msg(adminResult.error.message,true);
+    return;
+  }
+
+  if(!isSuperAdmin) {
+    msg("Ин саҳифа танҳо барои Super Admin аст.",true);
+    return;
+  }
+
+  $("adminPanel").hidden=false;
+  await loadRequests();
+}
+
+async function login() {
+  const email=$("email").value.trim();
+  const password=$("password").value;
+
+  if(!email||!password) {
+    msg("Email ва паролро ворид кунед.",true);
+    return;
+  }
+
+  $("loginBtn").disabled=true;
+
+  try {
+    const {error}=await sb.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if(error)throw error;
+
+    $("password").value="";
+    msg("Воридшавӣ муваффақ шуд.");
+    await checkSession();
+
+  } catch(error) {
+    msg(error.message,true);
+  } finally {
+    $("loginBtn").disabled=false;
+  }
+}
+
+async function logout() {
+  const {error}=await sb.auth.signOut();
+
+  if(error)return msg(error.message,true);
+
+  msg("Аз ҳисоб баромадед.");
+  await checkSession();
+}
+
+// ====================================
+// ROLE REQUESTS
+// ====================================
+
+async function loadRequests() {
+  if(!isSuperAdmin)return;
+
+  const {data,error}=await sb
+    .from("foodtj_role_requests")
+    .select("id,user_id,requested_role,status,created_at")
+    .order("created_at",{ascending:false})
+    .limit(500);
+
+  if(error) {
+    msg(error.message,true);
+    return;
+  }
+
+  allRequests=data||[];
+
+  $("totalCount").textContent=allRequests.length;
+  $("pendingCount").textContent=
+    allRequests.filter(x=>x.status==="pending").length;
+  $("approvedCount").textContent=
+    allRequests.filter(x=>x.status==="approved").length;
+  $("rejectedCount").textContent=
+    allRequests.filter(x=>x.status==="rejected").length;
+
+  renderRequests();
+}
+
+function renderRequests() {
+  const filter=$("filter").value;
+
+  const rows=allRequests.filter(x=>
+    filter==="all"||x.status===filter
+  );
+
+  $("requests").innerHTML=rows.map(x=>`
+    <div class="item">
+      <p><strong>Корбар:</strong> ${esc(x.user_id)}</p>
+      <p><strong>Нақш:</strong> ${esc(roleName(x.requested_role))}</p>
+      <p><strong>Ҳолат:</strong> ${esc(statusName(x.status))}</p>
+      <p class="muted">${esc(dateName(x.created_at))}</p>
+
+      ${x.status==="pending"?`
+        <button
+          data-id="${esc(x.id)}"
+          data-decision="approved">
+          Тасдиқ
+        </button>
+
+        <button
+          class="danger"
+          data-id="${esc(x.id)}"
+          data-decision="rejected">
+          Рад
+        </button>
+      `:""}
+    </div>
+  `).join("")||
+    '<p class="muted">Дархост нест.</p>';
+}
+
+async function reviewRequest(id,decision) {
+  if(!isSuperAdmin)return;
+
+  if(!["approved","rejected"].includes(decision))
+    return;
+
+  const confirmed=confirm(
+    decision==="approved"
+      ?"Ин нақшро тасдиқ мекунед?"
+      :"Ин дархостро рад мекунед?"
+  );
+
+  if(!confirmed)return;
+
+  const {error}=await sb.rpc(
+    "foodtj_review_role_request",
+    {
+      p_request_id:id,
+      p_decision:decision
+    }
+  );
+
+  if(error)return msg(error.message,true);
+
+  msg(
+    decision==="approved"
+      ?"Нақш тасдиқ шуд."
+      :"Дархост рад шуд."
+  );
+
+  await loadRequests();
+}
+
+// ====================================
+// EVENTS
+// ====================================
+
+$("loginBtn").addEventListener("click",login);
+$("logoutBtn").addEventListener("click",logout);
+$("refreshBtn").addEventListener("click",loadRequests);
+$("filter").addEventListener("change",renderRequests);
+
+$("requests").addEventListener("click",event=>{
+  const button=event.target.closest(
+    "[data-id][data-decision]"
+  );
+
+  if(!button)return;
+
+  reviewRequest(
+    button.dataset.id,
+    button.dataset.decision
+  );
+});
+
+sb.auth.onAuthStateChange(()=>{
+  setTimeout(checkSession,0);
+});
+
+checkSession();
+</script>
+</body>
+</html>
