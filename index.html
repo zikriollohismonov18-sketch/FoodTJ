@@ -73,6 +73,9 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
   .admin-kpi .kpi-value{font-size:20px}
   .admin-bar-row{grid-template-columns:85px 1fr 55px}
 }
+
+/* Analytics: daily totals and seven-day chart */
+.foodtj-analytics{margin:18px 0 22px}.foodtj-analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}.foodtj-metric{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}.foodtj-metric small{color:var(--muted);display:block;margin-bottom:8px}.foodtj-metric strong{font-size:clamp(18px,2.5vw,25px)}.foodtj-chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;margin-top:14px}.foodtj-chart{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}.foodtj-chart h4{margin:0 0 14px}.foodtj-bars{height:190px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;border-bottom:1px solid #d9e1ed;padding:10px 4px 0}.foodtj-bar-slot{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px}.foodtj-bar{width:min(100%,44px);min-height:2px;border-radius:6px 6px 0 0;background:#ff7626}.foodtj-bar.profit{background:#16a34a}.foodtj-bar-value{font-size:11px;color:#42526b;white-space:nowrap}.foodtj-axis{display:flex;justify-content:space-between;gap:8px;padding:8px 4px 0}.foodtj-axis span{flex:1;text-align:center;font-size:11px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -236,7 +239,7 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
   </section>
 
   <!-- ============================================================
-       ПАНЕЛИ АДМИНИСТРАТОР — ПУРРА
+       ПАНЕЛИ АДМИНИСТРАТОР — ПУРРА ИВАЗ ШУД
        ============================================================ -->
   <section id="adminSection" class="section hidden">
 
@@ -298,6 +301,23 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
         </div>
       </div>
 
+
+      <div class="foodtj-analytics" id="foodtjAnalytics">
+        <div class="admin-panel-title"><h3>📈 Ҳисоботи имрӯз ва 7 рӯзи охир</h3><span class="muted">Вақти Душанбе · танҳо фармоишҳои расонидашуда барои комиссия</span></div>
+        <div class="foodtj-analytics-grid">
+          <div class="foodtj-metric"><small>Фармоишҳои имрӯз (ҳама)</small><strong id="ftTodayOrders">—</strong></div>
+          <div class="foodtj-metric"><small>Расонидашуда имрӯз</small><strong id="ftTodayDelivered">—</strong></div>
+          <div class="foodtj-metric"><small>Маблағи фармоишҳои расонидашуда</small><strong id="ftTodaySales">—</strong></div>
+          <div class="foodtj-metric"><small>Комиссияи 8% (сабтшуда)</small><strong id="ftTodayCommission">—</strong></div>
+          <div class="foodtj-metric"><small>Бонуси 2% аз комиссия (тахмин)</small><strong id="ftTodayBonus">—</strong></div>
+          <div class="foodtj-metric"><small>Баъди бонус (на фоидаи холис)</small><strong id="ftTodayNet">—</strong></div>
+        </div>
+        <div class="foodtj-chart-grid">
+          <div class="foodtj-chart"><h4>📦 Фармоишҳо — 7 рӯз</h4><div id="ftOrdersChart"></div></div>
+          <div class="foodtj-chart"><h4>💰 Комиссияи расонидашуда — 7 рӯз</h4><div id="ftProfitChart"></div></div>
+        </div>
+        <p class="muted small" id="ftAnalyticsNote">Ҳисоб аз рӯйи маълумоти дастрас дар Supabase. Хароҷоти дигар ба ҳисоб дохил нашудаанд.</p>
+      </div>
       <div class="card">
         <div class="admin-panel-title">
           <h3>Фармоишҳои охирин</h3>
@@ -418,6 +438,9 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
     </div>
 
   </section>
+  <!-- ============================================================
+       ТАМОМИ ПАНЕЛИ АДМИНИСТРАТОР
+       ============================================================ -->
 
   <div class="footer">FoodTJ • Версияи аввал • Душанбе, Тоҷикистон</div>
 </main>
@@ -927,6 +950,7 @@ function restaurantOrderHtml(o){
 
 /* ============================================================
    FOODTJ PROFESSIONAL ADMIN DASHBOARD
+   Танҳо хондани маълумот — бе тағйир додани база
    ============================================================ */
 
 let adminData = {
@@ -938,7 +962,11 @@ let adminData = {
 };
 
 function adminIsAllowed(){
-  return !!(currentUser && profile && profile.role === 'admin');
+  return !!(
+    currentUser &&
+    profile &&
+    profile.role === 'admin'
+  );
 }
 
 function adminCount(id, value){
@@ -956,18 +984,48 @@ function adminEmpty(message){
 
 function adminStatus(value){
   const labels = {
-    new:'Нав', accepted:'Қабул шуд', preparing:'Дар тайёркунӣ',
-    ready_for_pickup:'Интизорӣ барои курьер', picked_up:'Курьер гирифт',
-    delivering:'Дар роҳ', delivered:'Рассида шуд', cancelled:'Бекор шуд',
-    pending:'Дар интизорӣ', approved:'Тасдиқ шуд', rejected:'Рад шуд'
+    new:'Нав',
+    accepted:'Қабул шуд',
+    preparing:'Дар тайёркунӣ',
+    ready_for_pickup:'Интизорӣ барои курьер',
+    picked_up:'Курьер гирифт',
+    delivering:'Дар роҳ',
+    delivered:'Рассида шуд',
+    cancelled:'Бекор шуд',
+    pending:'Дар интизорӣ',
+    approved:'Тасдиқ шуд',
+    rejected:'Рад шуд'
   };
+
   return labels[value] || value || '—';
 }
 
 function adminDate(value){
   if(!value) return '—';
   const d = new Date(value);
-  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString('tg-TJ');
+  return Number.isNaN(d.getTime())
+    ? '—'
+    : d.toLocaleString('tg-TJ');
+}
+
+// Retrieve orders in pages: Supabase commonly limits each request to 1000 rows.
+// A safety ceiling is reported visibly instead of silently treating partial data as complete.
+let foodtjOrdersTruncated = false;
+async function foodtjFetchAdminOrders(){
+  const pageSize=500, maxRows=10000, all=[];
+  foodtjOrdersTruncated=false;
+  for(let offset=0;offset<maxRows;offset+=pageSize){
+    const result=await sb.from('orders')
+      .select('id,status,total,subtotal,service_fee,delivery_fee,created_at,restaurant_id,customer_id,courier_id')
+      .order('created_at',{ascending:false}).order('id',{ascending:false})
+      .range(offset,offset+pageSize-1);
+    if(result.error) return {data:null,error:result.error};
+    const batch=result.data||[];
+    all.push(...batch);
+    if(batch.length<pageSize) return {data:all,error:null};
+  }
+  foodtjOrdersTruncated=true;
+  return {data:all,error:null};
 }
 
 async function adminLoadData(){
@@ -991,10 +1049,7 @@ async function adminLoadData(){
         .order('created_at',{ascending:false})
         .limit(500),
 
-      sb.from('orders')
-        .select('id,status,total,subtotal,service_fee,delivery_fee,created_at,restaurant_id,customer_id,courier_id')
-        .order('created_at',{ascending:false})
-        .limit(500),
+      foodtjFetchAdminOrders(),
 
       sb.from('foodtj_wallet_topup_requests')
         .select('id,user_id,amount,method,status,created_at')
@@ -1017,6 +1072,7 @@ async function adminLoadData(){
     adminData.couriers = adminData.users.filter(u => u.role === 'courier');
 
     adminRenderDashboard();
+    foodtjRenderAnalytics();
     adminRenderUsers();
     adminRenderRestaurants();
     adminRenderCouriers();
@@ -1053,21 +1109,33 @@ function adminRenderDashboard(){
       <div class="item">
         <div>
           <strong>Фармоиш #${esc(String(o.id).slice(0,8))}</strong>
-          <div class="muted">${esc(adminStatus(o.status))} · ${adminDate(o.created_at)}</div>
+          <div class="muted">
+            ${esc(adminStatus(o.status))} · ${adminDate(o.created_at)}
+          </div>
         </div>
         <strong>${money(o.total)}</strong>
       </div>
     `).join('')
     : adminEmpty('Фармоиш нест.');
 
-  const statuses = ['new','accepted','preparing','ready_for_pickup','picked_up','delivering','delivered','cancelled'];
-  const counts = statuses.map(status=>({ status, count:orders.filter(o=>o.status===status).length }));
+  const statuses = [
+    'new','accepted','preparing','ready_for_pickup',
+    'picked_up','delivering','delivered','cancelled'
+  ];
+
+  const counts = statuses.map(status=>({
+    status,
+    count:orders.filter(o=>o.status===status).length
+  }));
+
   const max = Math.max(1,...counts.map(x=>x.count));
 
   $('adminOrderStats').innerHTML = counts.map(x=>`
     <div class="admin-bar-row">
       <span>${esc(adminStatus(x.status))}</span>
-      <div class="admin-bar-track"><div class="admin-bar-fill" style="width:${x.count/max*100}%"></div></div>
+      <div class="admin-bar-track">
+        <div class="admin-bar-fill" style="width:${x.count/max*100}%"></div>
+      </div>
       <strong>${x.count}</strong>
     </div>
   `).join('');
@@ -1075,6 +1143,7 @@ function adminRenderDashboard(){
 
 function adminRenderUsers(){
   const q = ($('adminUserSearch')?.value||'').trim().toLowerCase();
+
   const rows = adminData.users.filter(u=>
     `${u.full_name||''} ${u.phone||''} ${u.role||''}`.toLowerCase().includes(q)
   );
@@ -1082,7 +1151,9 @@ function adminRenderUsers(){
   $('adminUsersList').innerHTML = rows.length
     ? `<div class="admin-table-wrap">
         <table class="admin-table">
-          <thead><tr><th>Ном</th><th>Телефон</th><th>Нақш</th><th>Санаи сабт</th></tr></thead>
+          <thead><tr>
+            <th>Ном</th><th>Телефон</th><th>Нақш</th><th>Санаи сабт</th>
+          </tr></thead>
           <tbody>${rows.map(u=>`
             <tr>
               <td>${esc(u.full_name||'—')}</td>
@@ -1098,6 +1169,7 @@ function adminRenderUsers(){
 
 function adminRenderRestaurants(){
   const q = ($('adminRestaurantSearch')?.value||'').trim().toLowerCase();
+
   const rows = adminData.restaurants.filter(r=>
     `${r.name||''} ${r.phone||''} ${r.address||''}`.toLowerCase().includes(q)
   );
@@ -1105,7 +1177,9 @@ function adminRenderRestaurants(){
   $('adminRestaurantsList').innerHTML = rows.length
     ? `<div class="admin-table-wrap">
         <table class="admin-table">
-          <thead><tr><th>Ресторан</th><th>Телефон</th><th>Суроға</th><th>Тасдиқ</th><th>Ҳолат</th></tr></thead>
+          <thead><tr>
+            <th>Ресторан</th><th>Телефон</th><th>Суроға</th><th>Тасдиқ</th><th>Ҳолат</th>
+          </tr></thead>
           <tbody>${rows.map(r=>`
             <tr>
               <td><strong>${esc(r.name)}</strong></td>
@@ -1122,6 +1196,7 @@ function adminRenderRestaurants(){
 
 function adminRenderCouriers(){
   const q = ($('adminCourierSearch')?.value||'').trim().toLowerCase();
+
   const rows = adminData.couriers.filter(u=>
     `${u.full_name||''} ${u.phone||''}`.toLowerCase().includes(q)
   );
@@ -1129,12 +1204,18 @@ function adminRenderCouriers(){
   $('adminCouriersList').innerHTML = rows.length
     ? `<div class="admin-table-wrap">
         <table class="admin-table">
-          <thead><tr><th>Ном</th><th>Телефон</th><th>Дастрасӣ</th></tr></thead>
+          <thead><tr>
+            <th>Ном</th><th>Телефон</th><th>Дастрасӣ</th>
+          </tr></thead>
           <tbody>${rows.map(u=>`
             <tr>
               <td>${esc(u.full_name||'—')}</td>
               <td>${esc(u.phone||'—')}</td>
-              <td><span class="admin-status">${u.is_available?'🟢 Онлайн':'⚪ Офлайн'}</span></td>
+              <td>
+                <span class="admin-status">
+                  ${u.is_available?'🟢 Онлайн':'⚪ Офлайн'}
+                </span>
+              </td>
             </tr>
           `).join('')}</tbody>
         </table>
@@ -1148,7 +1229,9 @@ function adminRenderOrders(){
   $('adminOrders').innerHTML = rows.length
     ? `<div class="admin-table-wrap">
         <table class="admin-table">
-          <thead><tr><th>Рақам</th><th>Ҳолат</th><th>Маблағ</th><th>Комиссия</th><th>Сана</th></tr></thead>
+          <thead><tr>
+            <th>Рақам</th><th>Ҳолат</th><th>Маблағ</th><th>Комиссия</th><th>Сана</th>
+          </tr></thead>
           <tbody>${rows.map(o=>`
             <tr>
               <td>#${esc(String(o.id).slice(0,8))}</td>
@@ -1169,7 +1252,9 @@ function adminRenderWallet(){
   $('adminWalletRequests').innerHTML = rows.length
     ? `<div class="admin-table-wrap">
         <table class="admin-table">
-          <thead><tr><th>Маблағ</th><th>Усул</th><th>Ҳолат</th><th>Сана</th></tr></thead>
+          <thead><tr>
+            <th>Маблағ</th><th>Усул</th><th>Ҳолат</th><th>Сана</th>
+          </tr></thead>
           <tbody>${rows.map(r=>`
             <tr>
               <td><strong>${money(r.amount)}</strong></td>
@@ -1184,20 +1269,84 @@ function adminRenderWallet(){
 }
 
 function adminRenderCommission(){
-  const total = adminData.orders.reduce((sum,o)=>sum+Number(o.service_fee||0),0);
+  const total = adminData.orders.reduce(
+    (sum,o)=>sum+Number(o.service_fee||0),0
+  );
+
   adminCount('admCommissionTotal',money(total));
 }
 
 function adminShowTab(tab){
   if(!adminIsAllowed()) return;
+
   document.querySelectorAll('[data-admin-tab]').forEach(button=>{
     button.classList.toggle('active',button.dataset.adminTab===tab);
   });
+
   document.querySelectorAll('.admin-panel').forEach(panel=>{
     panel.classList.toggle('active',panel.id==='adminPanel-'+tab);
   });
 }
 
+
+/* Analytics: Asia/Dushanbe (UTC+5), no fictional revenue. */
+function foodtjDayKey(date){
+  // formatToParts avoids relying on locale-specific en-CA date formatting.
+  const parts=new Intl.DateTimeFormat('en-GB',{
+    timeZone:'Asia/Dushanbe',year:'numeric',month:'2-digit',day:'2-digit'
+  }).formatToParts(date);
+  const part=(type)=>parts.find(p=>p.type===type)?.value;
+  return `${part('year')}-${part('month')}-${part('day')}`;
+}
+function foodtjRenderBars(id, values, days, isProfit){
+  const root=$(id); if(!root) return;
+  const max=Math.max(1,...values);
+  root.innerHTML='<div class="foodtj-bars">'+values.map((v,i)=>{
+    const h=v===0?2:Math.max(5,Math.round(v/max*145));
+    return `<div class="foodtj-bar-slot" title="${esc(days[i])}: ${esc(isProfit?money(v):v)}"><span class="foodtj-bar-value">${esc(isProfit?Number(v).toFixed(1):v)}</span><div class="foodtj-bar ${isProfit?'profit':''}" style="height:${h}px"></div></div>`;
+  }).join('')+'</div><div class="foodtj-axis">'+days.map(d=>`<span>${esc(d.slice(5))}</span>`).join('')+'</div>';
+}
+function foodtjRenderAnalytics(){
+  if(!adminIsAllowed()) return;
+  const orders=adminData.orders||[];
+  const now=new Date();
+  const today=foodtjDayKey(now);
+  const days=[];
+  for(let i=6;i>=0;i--){
+    // Noon UTC ensures a stable calendar day in Dushanbe.
+    const utc=new Date(Date.UTC(Number(today.slice(0,4)),Number(today.slice(5,7))-1,Number(today.slice(8,10))-i,12));
+    days.push(foodtjDayKey(utc));
+  }
+  const counts=days.map(()=>0), fees=days.map(()=>0);
+  let todayOrders=0,todayDelivered=0,todaySales=0,todayFee=0;
+  for(const o of orders){
+    if(!o.created_at)continue;
+    const date=new Date(o.created_at);
+    if(Number.isNaN(date.getTime()))continue;
+    const key=foodtjDayKey(date);
+    const idx=days.indexOf(key);
+    if(idx>=0)counts[idx]++;
+    if(key===today)todayOrders++;
+    if(o.status==='delivered'){
+      const fee=Number(o.service_fee)||0;
+      if(idx>=0)fees[idx]+=fee;
+      if(key===today){todayDelivered++;todaySales+=Number(o.total)||0;todayFee+=fee;}
+    }
+  }
+  const bonus=todayFee*0.02;
+  const set=(id,value)=>{if($(id))$(id).textContent=value;};
+  set('ftTodayOrders',todayOrders);
+  set('ftTodayDelivered',todayDelivered);
+  set('ftTodaySales',money(todaySales));
+  set('ftTodayCommission',money(todayFee));
+  set('ftTodayBonus',money(bonus));
+  set('ftTodayNet',money(todayFee-bonus));
+  foodtjRenderBars('ftOrdersChart',counts,days,false);
+  foodtjRenderBars('ftProfitChart',fees,days,true);
+  set('ftAnalyticsNote', 'Ҳисоб аз рӯйи санаи сохтани фармоиш (created_at), на санаи воқеии расонидан. Комиссия танҳо барои фармоишҳои ҳоло «Расонида шуд» ҳисоб шудааст. Баъди бонус фоидаи холис нест. '+(foodtjOrdersTruncated?'⚠ Танҳо 10 000 фармоиши охирин бор шуд; натиҷа метавонад нопурра бошад.':'Натиҷа аз фармоишҳои ба администратор тавассути RLS намоён ҳисоб шудааст.'));
+}
+
+/* ---------- Администратор: оғоз ва навсозӣ ---------- */
 async function loadAdminOrders(){
   await adminLoadData();
 }
@@ -1345,7 +1494,9 @@ $('adminTabs')?.addEventListener('click',e=>{
 });
 
 document.querySelectorAll('#adminSection [data-admin-tab]').forEach(button=>{
-  button.addEventListener('click',()=>{ adminShowTab(button.dataset.adminTab); });
+  button.addEventListener('click',()=>{
+    adminShowTab(button.dataset.adminTab);
+  });
 });
 
 $('adminUserSearch')?.addEventListener('input',adminRenderUsers);
