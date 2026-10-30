@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tg">
 <head>
@@ -1414,7 +1413,6 @@ a:hover {
     <div id="walletTopupRequests"></div>
   </div>
 </section>
-
 <!-- ===== ПАНЕЛИ КУРЬЕР ===== -->
 <section id="courierSection"
          class="section hidden">
@@ -2123,7 +2121,7 @@ async function submitAuth() {
       });
       if (error) throw error;
       notice('Сабти ном қабул шуд. Email-и худро барои тасдиқ санҷед.');
-      if (data.session) {
+       if (data.session) {
         await refreshSession();
       }
     } else {
@@ -2418,23 +2416,23 @@ async function loadMyOrders() {
 /* ===== Ҳамён ===== */
 async function loadWallet() {
   if (!currentUser) return;
-  const {data,error} = await sb.from('wallets').select('*')
+  const {data,error} = await sb.from('foodtj_wallet_accounts').select('*')
     .eq('user_id',currentUser.id).maybeSingle();
   if (error) {
     txt('walletBalance','Маълумот дастрас нест');
   } else txt('walletBalance',money(data?.balance));
 
-  const tx = await sb.from('wallet_transactions').select('*')
+  const tx = await sb.from('foodtj_wallet_transactions').select('*')
     .eq('user_id',currentUser.id)
     .order('created_at',{ascending:false}).limit(30);
   $('walletTransactions').innerHTML = tx.error
     ? `<div class="empty">${esc(tx.error.message)}</div>`
     : (tx.data||[]).map(x=>`
-      <div class="item"><span>${esc(x.type||'Амалиёт')}</span>
+      <div class="item"><span>${esc(x.transaction_type||'Амалиёт')}</span>
       <strong>${money(x.amount)}</strong></div>
     `).join('') || '<div class="empty">Амалиёт нест.</div>';
 
-  const req = await sb.from('wallet_topup_requests').select('*')
+  const req = await sb.from('foodtj_wallet_topup_requests').select('*')
     .eq('user_id',currentUser.id)
     .order('created_at',{ascending:false}).limit(30);
   $('walletTopupRequests').innerHTML = req.error
@@ -2450,7 +2448,7 @@ async function requestTopup() {
   const amount = Number($('walletAmount').value);
   if (!Number.isFinite(amount) || amount<20 || amount>5000)
     return notice('Маблағ бояд аз 20 то 5000 сомонӣ бошад.',true);
-  const {error} = await sb.from('wallet_topup_requests').insert({
+  const {error} = await sb.from('foodtj_wallet_topup_requests').insert({
     user_id:currentUser.id,amount,
     method:$('walletMethod').value,status:'pending'
   });
@@ -2669,7 +2667,7 @@ function renderAdminOverview() {
 }
 
 async function loadAdminFinance() {
-  const result = await sb.from('wallet_topup_requests')
+  const result = await sb.from('foodtj_wallet_topup_requests')
     .select('*').order('created_at',{ascending:false}).limit(100);
   if (result.error) {
     $('adminWalletRequests').textContent = result.error.message;
@@ -2681,9 +2679,40 @@ async function loadAdminFinance() {
     <div class="item">
       <span>${esc(x.user_id)} · ${money(x.amount)} · ${esc(x.status)}</span>
       <span>${esc(x.method)}</span>
+      ${x.status === 'pending' ? `
+        <button type="button" data-wallet-review="approved" data-wallet-request="${esc(x.id)}">✅ Тасдиқ</button>
+        <button type="button" class="danger" data-wallet-review="rejected" data-wallet-request="${esc(x.id)}">❌ Рад</button>
+      ` : ''}
     </div>
   `).join('') || '<div class="empty">Дархост нест.</div>';
 }
+
+/* ===== Тасдиқи бехатари дархости ҳамён ===== */
+async function reviewWalletTopup(id, decision, button) {
+  if (profile?.role !== 'admin') return notice('Танҳо Admin иҷозат дорад.', true);
+  const note = prompt(decision === 'approved' ? 'Рақами тасдиқи пардохти гирифташуда:' : 'Сабаби рад:', '');
+  if (note === null) return;
+  if (decision === 'approved' && !confirm('Пардохти воқеӣ ба ҳисоби FoodTJ расидааст?')) return;
+  button.disabled = true;
+  try {
+    const {error} = await sb.rpc('foodtj_review_wallet_topup', {
+      p_request_id: id, p_decision: decision, p_admin_note: note
+    });
+    if (error) throw error;
+    notice(decision === 'approved' ? 'Дархост тасдиқ шуд.' : 'Дархост рад шуд.');
+    await loadAdminFinance();
+    if (currentUser) await loadWallet();
+  } catch (e) {
+    notice(errorText(e), true);
+  } finally {
+    button.disabled = false;
+  }
+}
+document.addEventListener('click', e => {
+  const button = e.target.closest('[data-wallet-review]');
+  if (!button) return;
+  reviewWalletTopup(button.dataset.walletRequest, button.dataset.walletReview, button);
+});
 
 /* ===== Амалҳои администратор ===== */
 async function updateOrderStatus(id,status) {
