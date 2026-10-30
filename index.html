@@ -239,9 +239,6 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
     <div class="card section"><h3>Фармоишҳои ресторан</h3><div id="restaurantOrders"></div></div>
   </section>
 
-  <!-- ============================================================
-       ПАНЕЛИ АДМИНИСТРАТОР — ПУРРА
-       ============================================================ -->
   <section id="adminSection" class="section hidden">
 
     <div class="admin-header">
@@ -267,7 +264,6 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
       <button data-admin-tab="settings">⚙ Танзимот</button>
     </div>
 
-    <!-- DASHBOARD -->
     <div class="admin-panel active" id="adminPanel-overview">
       <div class="admin-kpis">
         <div class="admin-kpi">
@@ -301,7 +297,6 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
           <div class="kpi-value" id="admTopupsCount">—</div>
         </div>
       </div>
-
 
       <div class="foodtj-analytics" id="foodtjAnalytics">
         <div class="admin-panel-title"><h3>📈 Ҳисоботи имрӯз ва 7 рӯзи охир</h3><span class="muted">Вақти Душанбе · танҳо фармоишҳои расонидашуда барои комиссия</span></div>
@@ -337,7 +332,6 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
       </div>
     </div>
 
-    <!-- USERS -->
     <div class="admin-panel" id="adminPanel-users">
       <div class="admin-panel-title">
         <h3>Истифодабарандагон</h3>
@@ -349,7 +343,6 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
       </div>
     </div>
 
-    <!-- RESTAURANTS -->
     <div class="admin-panel" id="adminPanel-restaurants">
       <div class="admin-panel-title">
         <h3>Идоракунии ресторанҳо</h3>
@@ -360,7 +353,6 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
       </div>
     </div>
 
-    <!-- COURIERS -->
     <div class="admin-panel" id="adminPanel-couriers">
       <div class="admin-panel-title">
         <h3>Идоракунии курьерҳо</h3>
@@ -371,7 +363,6 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
       </div>
     </div>
 
-    <!-- ORDERS -->
     <div class="admin-panel" id="adminPanel-orders">
       <div class="admin-panel-title">
         <h3>Ҳамаи фармоишҳо</h3>
@@ -381,7 +372,6 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
       </div>
     </div>
 
-    <!-- WALLET -->
     <div class="admin-panel" id="adminPanel-wallet">
       <div class="admin-panel-title">
         <h3>Дархостҳои пур кардани ҳамён</h3>
@@ -395,7 +385,6 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
       </div>
     </div>
 
-    <!-- COMMISSION -->
     <div class="admin-panel" id="adminPanel-commission">
       <div class="admin-panel-title">
         <h3>Ҳисоботи комиссия</h3>
@@ -421,7 +410,6 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
       </div>
     </div>
 
-    <!-- SETTINGS -->
     <div class="admin-panel" id="adminPanel-settings">
       <div class="admin-panel-title">
         <h3>Танзимоти FoodTJ</h3>
@@ -445,7 +433,7 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
 
 <script>
 /* ============================================================
-   FoodTJ — версияи ниҳоӣ (пурра ислоҳшуда + панели администратор)
+   FoodTJ — версияи ниҳоӣ (пурра ислоҳшуда)
    ============================================================ */
 
 const SUPABASE_URL = 'https://rgminzzmlktkliliiupt.supabase.co';
@@ -649,7 +637,7 @@ async function init(){
     $('foodtjConnectionStatus').textContent = 'Supabase: пайваст шуд · ' + (session ? 'корбар ворид шудааст' : 'барои воридшавӣ омода');
     if(session) await loadProfile(session.user);
 
-    // Ҳар қисми саҳифа мустақил бор мешавад: хатои як қисм дигаронро намебандад.
+    renderPublicCatalog();
     const tasks = await Promise.allSettled([loadRestaurants(), loadFoodCatalog()]);
     for (const result of tasks) {
       if (result.status === 'rejected') console.error('FoodTJ load:', result.reason);
@@ -693,7 +681,7 @@ async function loadWallet(){
     $('walletBalance').textContent = '—';
     $('walletTransactions').innerHTML = '<div class="empty">Ҳамён ҳоло фаъол нест. SQL-и ҳамёнро дар Supabase иҷро кунед.</div>';
     $('walletTopupRequests').innerHTML = '<div class="empty">Ҳамён ҳоло фаъол нест. SQL-и ҳамёнро дар Supabase иҷро кунед.</div>';
-    console.warn('FoodTJ wallet tables unavailable. Run FoodTJ_wallet_setup_fixed_v2.sql in Supabase.', accountError);
+    console.warn('FoodTJ wallet tables unavailable.', accountError);
     return;
   }
   if(!account){
@@ -702,13 +690,13 @@ async function loadWallet(){
     });
     if(insErr && insErr.code !== '23505'){
       $('walletBalance').textContent = '—';
-      showNotice('Ҳамён сохта нашуд: ' + insErr.message + '. SQL-и навшудаи FoodTJ Wallet-ро иҷро кунед.','error');
+      showNotice('Ҳамён сохта нашуд: ' + insErr.message, 'error');
       return;
     }
-    const {data:createdAccount,error:reloadError} = await sb.from('foodtj_wallet_accounts').select('balance,currency').eq('user_id',currentUser.id).maybeSingle();
-    if(reloadError || !createdAccount){
+    const {data:createdAccount} = await sb.from('foodtj_wallet_accounts').select('balance,currency').eq('user_id',currentUser.id).maybeSingle();
+    if(!createdAccount){
       $('walletBalance').textContent = '—';
-      showNotice('Ҳамён сохта шуданаш тасдиқ нашуд. Бори дигар саҳифаро нав кунед.','error');
+      showNotice('Ҳамён сохта шуданаш тасдиқ нашуд. Саҳифаро нав кунед.', 'error');
       return;
     }
     account = createdAccount;
@@ -730,7 +718,7 @@ async function requestWalletTopup(){
     $('walletAmount').value='';
     showNotice('Дархости пуркунӣ сабт шуд. Бақия танҳо баъди тасдиқи администратор зиёд мешавад.','success');
     await loadWallet();
-  }catch(e){showNotice('Дархост сабт нашуд: '+(e.message||e)+'. Аввал SQL-и ҳамёнро дар Supabase иҷро кунед.','error');}
+  }catch(e){showNotice('Дархост сабт нашуд: '+(e.message||e),'error');}
   finally{setBusy(btn,false);}
 }
 
@@ -959,24 +947,13 @@ function restaurantOrderHtml(o){
 }
 
 /* ============================================================
-   FOODTJ PROFESSIONAL ADMIN DASHBOARD
-   Танҳо хондани маълумот — бе тағйир додани база
+   ADMIN DASHBOARD
    ============================================================ */
 
-let adminData = {
-  users: [],
-  restaurants: [],
-  couriers: [],
-  orders: [],
-  topups: []
-};
+let adminData = { users: [], restaurants: [], couriers: [], orders: [], topups: [] };
 
 function adminIsAllowed(){
-  return !!(
-    currentUser &&
-    profile &&
-    profile.role === 'admin'
-  );
+  return !!(currentUser && profile && profile.role === 'admin');
 }
 
 function adminCount(id, value){
@@ -994,32 +971,20 @@ function adminEmpty(message){
 
 function adminStatus(value){
   const labels = {
-    new:'Нав',
-    accepted:'Қабул шуд',
-    preparing:'Дар тайёркунӣ',
-    ready_for_pickup:'Интизорӣ барои курьер',
-    picked_up:'Курьер гирифт',
-    delivering:'Дар роҳ',
-    delivered:'Расонида шуд',
-    cancelled:'Бекор шуд',
-    pending:'Дар интизорӣ',
-    approved:'Тасдиқ шуд',
-    rejected:'Рад шуд'
+    new:'Нав', accepted:'Қабул шуд', preparing:'Дар тайёркунӣ',
+    ready_for_pickup:'Интизорӣ барои курьер', picked_up:'Курьер гирифт',
+    delivering:'Дар роҳ', delivered:'Рассида шуд', cancelled:'Бекор шуд',
+    pending:'Дар интизорӣ', approved:'Тасдиқ шуд', rejected:'Рад шуд'
   };
-
   return labels[value] || value || '—';
 }
 
 function adminDate(value){
   if(!value) return '—';
   const d = new Date(value);
-  return Number.isNaN(d.getTime())
-    ? '—'
-    : d.toLocaleString('tg-TJ');
+  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString('tg-TJ');
 }
 
-// Retrieve orders in pages: Supabase commonly limits each request to 1000 rows.
-// A safety ceiling is reported visibly instead of silently treating partial data as complete.
 let foodtjOrdersTruncated = false;
 async function foodtjFetchAdminOrders(){
   const pageSize=500, maxRows=10000, all=[];
@@ -1049,22 +1014,10 @@ async function adminLoadData(){
 
   try {
     const results = await Promise.all([
-      sb.from('profiles')
-        .select('id,phone,full_name,role,is_available,created_at')
-        .order('created_at',{ascending:false})
-        .limit(500),
-
-      sb.from('restaurants')
-        .select('id,name,phone,address,is_open,is_approved,created_at,owner_id')
-        .order('created_at',{ascending:false})
-        .limit(500),
-
+      sb.from('profiles').select('id,phone,full_name,role,is_available,created_at').order('created_at',{ascending:false}).limit(500),
+      sb.from('restaurants').select('id,name,phone,address,is_open,is_approved,created_at,owner_id').order('created_at',{ascending:false}).limit(500),
       foodtjFetchAdminOrders(),
-
-      sb.from('foodtj_wallet_topup_requests')
-        .select('id,user_id,amount,method,status,created_at')
-        .order('created_at',{ascending:false})
-        .limit(200)
+      sb.from('foodtj_wallet_topup_requests').select('id,user_id,amount,method,status,created_at').order('created_at',{ascending:false}).limit(200)
     ]);
 
     const [usersResult, restaurantsResult, ordersResult, topupsResult] = results;
@@ -1072,7 +1025,6 @@ async function adminLoadData(){
     if(usersResult.error) throw new Error('Профилҳо: ' + usersResult.error.message);
     if(restaurantsResult.error) throw new Error('Ресторанҳо: ' + restaurantsResult.error.message);
     if(ordersResult.error) throw new Error('Фармоишҳо: ' + ordersResult.error.message);
-    // Нокомии ҳамён набояд тамоми панели администраторро боздорад.
     if(topupsResult.error) console.warn('Admin wallet requests:', topupsResult.error.message);
 
     adminData.users = usersResult.data || [];
@@ -1113,39 +1065,26 @@ function adminRenderDashboard(){
   adminCount('admSalesTotal',money(sales));
 
   const recent = orders.slice(0,8);
-
   $('adminRecentOrders').innerHTML = recent.length
     ? recent.map(o=>`
       <div class="item">
         <div>
           <strong>Фармоиш #${esc(String(o.id).slice(0,8))}</strong>
-          <div class="muted">
-            ${esc(adminStatus(o.status))} · ${adminDate(o.created_at)}
-          </div>
+          <div class="muted">${esc(adminStatus(o.status))} · ${adminDate(o.created_at)}</div>
         </div>
         <strong>${money(o.total)}</strong>
       </div>
     `).join('')
     : adminEmpty('Фармоиш нест.');
 
-  const statuses = [
-    'new','accepted','preparing','ready_for_pickup',
-    'picked_up','delivering','delivered','cancelled'
-  ];
-
-  const counts = statuses.map(status=>({
-    status,
-    count:orders.filter(o=>o.status===status).length
-  }));
-
+  const statuses = ['new','accepted','preparing','ready_for_pickup','picked_up','delivering','delivered','cancelled'];
+  const counts = statuses.map(status=>({ status, count:orders.filter(o=>o.status===status).length }));
   const max = Math.max(1,...counts.map(x=>x.count));
 
   $('adminOrderStats').innerHTML = counts.map(x=>`
     <div class="admin-bar-row">
       <span>${esc(adminStatus(x.status))}</span>
-      <div class="admin-bar-track">
-        <div class="admin-bar-fill" style="width:${x.count/max*100}%"></div>
-      </div>
+      <div class="admin-bar-track"><div class="admin-bar-fill" style="width:${x.count/max*100}%"></div></div>
       <strong>${x.count}</strong>
     </div>
   `).join('');
@@ -1153,25 +1092,12 @@ function adminRenderDashboard(){
 
 function adminRenderUsers(){
   const q = ($('adminUserSearch')?.value||'').trim().toLowerCase();
-
-  const rows = adminData.users.filter(u=>
-    `${u.full_name||''} ${u.phone||''} ${u.role||''}`.toLowerCase().includes(q)
-  );
-
+  const rows = adminData.users.filter(u=>`${u.full_name||''} ${u.phone||''} ${u.role||''}`.toLowerCase().includes(q));
   $('adminUsersList').innerHTML = rows.length
     ? `<div class="admin-table-wrap">
         <table class="admin-table">
-          <thead><tr>
-            <th>Ном</th><th>Телефон</th><th>Нақш</th><th>Санаи сабт</th>
-          </tr></thead>
-          <tbody>${rows.map(u=>`
-            <tr>
-              <td>${esc(u.full_name||'—')}</td>
-              <td>${esc(u.phone||'—')}</td>
-              <td>${esc(roleLabel(u.role))}</td>
-              <td>${adminDate(u.created_at)}</td>
-            </tr>
-          `).join('')}</tbody>
+          <thead><tr><th>Ном</th><th>Телефон</th><th>Нақш</th><th>Санаи сабт</th></tr></thead>
+          <tbody>${rows.map(u=>`<tr><td>${esc(u.full_name||'—')}</td><td>${esc(u.phone||'—')}</td><td>${esc(roleLabel(u.role))}</td><td>${adminDate(u.created_at)}</td></tr>`).join('')}</tbody>
         </table>
       </div>`
     : adminEmpty('Истифодабаранда ёфт нашуд.');
@@ -1179,26 +1105,12 @@ function adminRenderUsers(){
 
 function adminRenderRestaurants(){
   const q = ($('adminRestaurantSearch')?.value||'').trim().toLowerCase();
-
-  const rows = adminData.restaurants.filter(r=>
-    `${r.name||''} ${r.phone||''} ${r.address||''}`.toLowerCase().includes(q)
-  );
-
+  const rows = adminData.restaurants.filter(r=>`${r.name||''} ${r.phone||''} ${r.address||''}`.toLowerCase().includes(q));
   $('adminRestaurantsList').innerHTML = rows.length
     ? `<div class="admin-table-wrap">
         <table class="admin-table">
-          <thead><tr>
-            <th>Ресторан</th><th>Телефон</th><th>Суроға</th><th>Тасдиқ</th><th>Ҳолат</th>
-          </tr></thead>
-          <tbody>${rows.map(r=>`
-            <tr>
-              <td><strong>${esc(r.name)}</strong></td>
-              <td>${esc(r.phone||'—')}</td>
-              <td>${esc(r.address||'—')}</td>
-              <td>${r.is_approved?'Тасдиқшуда':'Интизорӣ'}</td>
-              <td>${r.is_open?'Кушода':'Баста'}</td>
-            </tr>
-          `).join('')}</tbody>
+          <thead><tr><th>Ресторан</th><th>Телефон</th><th>Суроға</th><th>Тасдиқ</th><th>Ҳолат</th></tr></thead>
+          <tbody>${rows.map(r=>`<tr><td><strong>${esc(r.name)}</strong></td><td>${esc(r.phone||'—')}</td><td>${esc(r.address||'—')}</td><td>${r.is_approved?'Тасдиқшуда':'Интизорӣ'}</td><td>${r.is_open?'Кушода':'Баста'}</td></tr>`).join('')}</tbody>
         </table>
       </div>`
     : adminEmpty('Ресторан ёфт нашуд.');
@@ -1206,28 +1118,12 @@ function adminRenderRestaurants(){
 
 function adminRenderCouriers(){
   const q = ($('adminCourierSearch')?.value||'').trim().toLowerCase();
-
-  const rows = adminData.couriers.filter(u=>
-    `${u.full_name||''} ${u.phone||''}`.toLowerCase().includes(q)
-  );
-
+  const rows = adminData.couriers.filter(u=>`${u.full_name||''} ${u.phone||''}`.toLowerCase().includes(q));
   $('adminCouriersList').innerHTML = rows.length
     ? `<div class="admin-table-wrap">
         <table class="admin-table">
-          <thead><tr>
-            <th>Ном</th><th>Телефон</th><th>Дастрасӣ</th>
-          </tr></thead>
-          <tbody>${rows.map(u=>`
-            <tr>
-              <td>${esc(u.full_name||'—')}</td>
-              <td>${esc(u.phone||'—')}</td>
-              <td>
-                <span class="admin-status">
-                  ${u.is_available?'🟢 Онлайн':'⚪ Офлайн'}
-                </span>
-              </td>
-            </tr>
-          `).join('')}</tbody>
+          <thead><tr><th>Ном</th><th>Телефон</th><th>Дастрасӣ</th></tr></thead>
+          <tbody>${rows.map(u=>`<tr><td>${esc(u.full_name||'—')}</td><td>${esc(u.phone||'—')}</td><td><span class="admin-status">${u.is_available?'🟢 Онлайн':'⚪ Офлайн'}</span></td></tr>`).join('')}</tbody>
         </table>
       </div>`
     : adminEmpty('Курьер ёфт нашуд.');
@@ -1235,22 +1131,11 @@ function adminRenderCouriers(){
 
 function adminRenderOrders(){
   const rows = adminData.orders;
-
   $('adminOrders').innerHTML = rows.length
     ? `<div class="admin-table-wrap">
         <table class="admin-table">
-          <thead><tr>
-            <th>Рақам</th><th>Ҳолат</th><th>Маблағ</th><th>Комиссия</th><th>Сана</th>
-          </tr></thead>
-          <tbody>${rows.map(o=>`
-            <tr>
-              <td>#${esc(String(o.id).slice(0,8))}</td>
-              <td>${esc(adminStatus(o.status))}</td>
-              <td><strong>${money(o.total)}</strong></td>
-              <td>${money(o.service_fee)}</td>
-              <td>${adminDate(o.created_at)}</td>
-            </tr>
-          `).join('')}</tbody>
+          <thead><tr><th>Рақам</th><th>Ҳолат</th><th>Маблағ</th><th>Комиссия</th><th>Сана</th></tr></thead>
+          <tbody>${rows.map(o=>`<tr><td>#${esc(String(o.id).slice(0,8))}</td><td>${esc(adminStatus(o.status))}</td><td><strong>${money(o.total)}</strong></td><td>${money(o.service_fee)}</td><td>${adminDate(o.created_at)}</td></tr>`).join('')}</tbody>
         </table>
       </div>`
     : adminEmpty('Фармоиш нест.');
@@ -1258,53 +1143,34 @@ function adminRenderOrders(){
 
 function adminRenderWallet(){
   const rows = adminData.topups;
-
   $('adminWalletRequests').innerHTML = rows.length
     ? `<div class="admin-table-wrap">
         <table class="admin-table">
-          <thead><tr>
-            <th>Маблағ</th><th>Усул</th><th>Ҳолат</th><th>Сана</th>
-          </tr></thead>
-          <tbody>${rows.map(r=>`
-            <tr>
-              <td><strong>${money(r.amount)}</strong></td>
-              <td>${esc(walletMethodLabel(r.method))}</td>
-              <td>${esc(adminStatus(r.status))}</td>
-              <td>${adminDate(r.created_at)}</td>
-            </tr>
-          `).join('')}</tbody>
+          <thead><tr><th>Маблағ</th><th>Усул</th><th>Ҳолат</th><th>Сана</th></tr></thead>
+          <tbody>${rows.map(r=>`<tr><td><strong>${money(r.amount)}</strong></td><td>${esc(walletMethodLabel(r.method))}</td><td>${esc(adminStatus(r.status))}</td><td>${adminDate(r.created_at)}</td></tr>`).join('')}</tbody>
         </table>
       </div>`
     : adminEmpty('Дархости пуркунӣ нест.');
 }
 
 function adminRenderCommission(){
-  const total = adminData.orders.reduce(
-    (sum,o)=>sum+Number(o.service_fee||0),0
-  );
-
+  const total = adminData.orders.reduce((sum,o)=>sum+Number(o.service_fee||0),0);
   adminCount('admCommissionTotal',money(total));
 }
 
 function adminShowTab(tab){
   if(!adminIsAllowed()) return;
-
   document.querySelectorAll('[data-admin-tab]').forEach(button=>{
     button.classList.toggle('active',button.dataset.adminTab===tab);
   });
-
   document.querySelectorAll('.admin-panel').forEach(panel=>{
     panel.classList.toggle('active',panel.id==='adminPanel-'+tab);
   });
 }
 
-
-/* Analytics: Asia/Dushanbe (UTC+5), no fictional revenue. */
+/* Analytics */
 function foodtjDayKey(date){
-  // formatToParts avoids relying on locale-specific en-CA date formatting.
-  const parts=new Intl.DateTimeFormat('en-GB',{
-    timeZone:'Asia/Dushanbe',year:'numeric',month:'2-digit',day:'2-digit'
-  }).formatToParts(date);
+  const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Dushanbe',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(date);
   const part=(type)=>parts.find(p=>p.type===type)?.value;
   return `${part('year')}-${part('month')}-${part('day')}`;
 }
@@ -1323,7 +1189,6 @@ function foodtjRenderAnalytics(){
   const today=foodtjDayKey(now);
   const days=[];
   for(let i=6;i>=0;i--){
-    // Noon UTC ensures a stable calendar day in Dushanbe.
     const utc=new Date(Date.UTC(Number(today.slice(0,4)),Number(today.slice(5,7))-1,Number(today.slice(8,10))-i,12));
     days.push(foodtjDayKey(utc));
   }
@@ -1353,10 +1218,9 @@ function foodtjRenderAnalytics(){
   set('ftTodayNet',money(todayFee-bonus));
   foodtjRenderBars('ftOrdersChart',counts,days,false);
   foodtjRenderBars('ftProfitChart',fees,days,true);
-  set('ftAnalyticsNote', 'Ҳисоб аз рӯйи санаи сохтани фармоиш (created_at), на санаи воқеии расонидан. Комиссия танҳо барои фармоишҳои ҳоло «Расонида шуд» ҳисоб шудааст. Баъди бонус фоидаи холис нест. '+(foodtjOrdersTruncated?'⚠ Танҳо 10 000 фармоиши охирин бор шуд; натиҷа метавонад нопурра бошад.':'Натиҷа аз фармоишҳои ба администратор тавассути RLS намоён ҳисоб шудааст.'));
+  set('ftAnalyticsNote', 'Ҳисоб аз рӯйи санаи сохтани фармоиш (created_at). Комиссия танҳо барои фармоишҳои «Расонида шуд». Баъди бонус фоидаи холис нест. '+(foodtjOrdersTruncated?'⚠ Танҳо 10 000 фармоиши охирин бор шуд.':'Натиҷа аз фармоишҳои ба администратор тавассути RLS намоён ҳисоб шудааст.'));
 }
 
-/* ---------- Администратор: оғоз ва навсозӣ ---------- */
 async function loadAdminOrders(){
   await adminLoadData();
 }
@@ -1419,7 +1283,7 @@ async function createOrder(){
     await loadMyOrders();
     toggle('myOrdersSection', true);
   } catch(e){
-    showNotice('Фармоиш ҳоло сохта нашуд: ' + (e.message || e) + '. Санҷед, ки функсияи foodtj_create_order дар Supabase сохта шудааст.', 'error');
+    showNotice('Фармоиш ҳоло сохта нашуд: ' + (e.message || e), 'error');
   } finally {
     setBusy(btn, false);
   }
@@ -1443,7 +1307,6 @@ $('accountTop').onclick = () => { toggle('accountPanel', true); $('accountPanel'
 $('walletRefresh').onclick = loadWallet;
 $('walletTopupRequest').onclick = requestWalletTopup;
 
-/* ---------- Sidebar навигатсия (як listener) ---------- */
 document.querySelectorAll('.foodtj-nav a').forEach(link => {
   link.addEventListener('click', (e) => {
     const href = link.getAttribute('href') || '';
@@ -1496,7 +1359,6 @@ document.querySelectorAll('.foodtj-nav a').forEach(link => {
   });
 });
 
-/* ---------- Гузариш байни бахшҳои панели админ ---------- */
 $('adminTabs')?.addEventListener('click',e=>{
   const button=e.target.closest('[data-admin-tab]');
   if(!button) return;
@@ -1601,7 +1463,7 @@ $('restaurantOrders').onclick = async e => {
   const id = b.dataset.restaurantStatus, newStatus = $('st-' + id)?.value;
   if(!newStatus) return;
   const { error } = await sb.rpc('foodtj_restaurant_update_order_status', { p_order_id: id, p_new_status: newStatus });
-  if(error){ showNotice('Ҳолати фармоиш иваз нашуд: ' + error.message + '. Функсияи RPC лозим аст.', 'error'); return; }
+  if(error){ showNotice('Ҳолати фармоиш иваз нашуд: ' + error.message, 'error'); return; }
   showNotice('Ҳолати фармоиш нав шуд.', 'success');
   await loadOwnerPanel();
 };
@@ -1610,7 +1472,6 @@ $('foodCatalogSearch').addEventListener('input', renderFoodCatalog);
 $('foodCatalogCategory').addEventListener('change', renderFoodCatalog);
 $('reloadFoodCatalog').addEventListener('click', loadFoodCatalog);
 
-/* ---------- Оғоз ---------- */
 init().catch(e => {
   console.error(e);
   const c = document.getElementById('restaurants');
