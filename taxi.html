@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+ content="width=device-width,initial-scale=1">
+<title>FoodTJ Taxi</title>
+
+<link rel="stylesheet"
+ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:#f4f7f5;
+ color:#17251e;
+}
+header{
+ background:#087f5b;
+ color:white;
+ padding:18px;
+ text-align:center;
+}
+header h1{margin:0 0 6px}
+main{
+ max-width:850px;
+ margin:auto;
+ padding:15px;
+}
+.card{
+ background:white;
+ border-radius:15px;
+ padding:17px;
+ margin-bottom:15px;
+ box-shadow:0 3px 12px #00000012;
+}
+#map{
+ height:380px;
+ border-radius:12px;
+}
+button{
+ background:#087f5b;
+ color:white;
+ border:0;
+ border-radius:10px;
+ padding:13px;
+ cursor:pointer;
+ font-size:15px;
+}
+button.secondary{
+ background:#e6f3ed;
+ color:#087f5b;
+}
+.actions{
+ display:flex;
+ gap:8px;
+ flex-wrap:wrap;
+}
+.info{
+ padding:12px;
+ background:#f1f7f3;
+ border-radius:10px;
+ margin-top:12px;
+ line-height:1.9;
+}
+a{color:#087f5b}
+</style>
+</head>
+
+<body>
+<header>
+<h1>🚕 FoodTJ Taxi</h1>
+<div>Таксии Душанбе</div>
+</header>
+
+<main>
+
+<div class="card">
+<a href="./index.html">← Бозгашт ба FoodTJ</a>
+<h3>Ҷойи саворшавӣ ва расидан</h3>
+
+<p id="instruction">
+Аввал нуқтаи саворшавиро дар харита интихоб кун.
+</p>
+
+<div id="map"></div>
+
+<div class="actions" style="margin-top:12px">
+<button onclick="resetPoints()" class="secondary">
+Аз нав интихоб кардан
+</button>
+<button onclick="calculateFare()">
+Ҳисоб кардани нарх
+</button>
+</div>
+</div>
+
+<div class="card">
+<h3>Ҳисоби сафар</h3>
+<div id="result" class="info">
+Ҳоло ду нуқта интихоб нашудааст.
+</div>
+<button onclick="showOrderMessage()"
+ style="margin-top:12px">
+Фармоиши таксӣ
+</button>
+<p id="orderMessage"></p>
+</div>
+
+</main>
+
+<script>
+const map=L.map("map").setView(
+ [38.5598,68.7870],12
+);
+
+L.tileLayer(
+ "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+ {
+  maxZoom:19,
+  attribution:"© OpenStreetMap contributors"
+ }
+).addTo(map);
+
+let pickup=null;
+let destination=null;
+let pickupMarker=null;
+let destinationMarker=null;
+let routeLine=null;
+let estimatedFare=null;
+
+map.on("click",function(e){
+ const point=e.latlng;
+
+ if(!pickup){
+  pickup=point;
+  pickupMarker=L.marker(point)
+   .addTo(map)
+   .bindPopup("Ҷойи саворшавӣ")
+   .openPopup();
+
+  document.getElementById("instruction")
+   .textContent="Акнун ҷойи расиданро интихоб кун.";
+  return;
+ }
+
+ if(!destination){
+  destination=point;
+  destinationMarker=L.marker(point)
+   .addTo(map)
+   .bindPopup("Ҷойи расидан")
+   .openPopup();
+
+  routeLine=L.polyline(
+   [pickup,destination],
+   {color:"#087f5b",weight:4}
+  ).addTo(map);
+
+  map.fitBounds(routeLine.getBounds(),{
+   padding:[30,30]
+  });
+
+  document.getElementById("instruction")
+   .textContent="Ҳар ду нуқта интихоб шуданд.";
+ }
+});
+
+function resetPoints(){
+ if(pickupMarker)map.removeLayer(pickupMarker);
+ if(destinationMarker)map.removeLayer(destinationMarker);
+ if(routeLine)map.removeLayer(routeLine);
+
+ pickup=null;
+ destination=null;
+ pickupMarker=null;
+ destinationMarker=null;
+ routeLine=null;
+ estimatedFare=null;
+
+ document.getElementById("instruction")
+  .textContent="Аввал нуқтаи саворшавиро интихоб кун.";
+
+ document.getElementById("result")
+  .textContent="Ҳоло ду нуқта интихоб нашудааст.";
+
+ document.getElementById("orderMessage")
+  .textContent="";
+}
+
+function calculateFare(){
+ if(!pickup||!destination){
+  alert("Аввал ду нуқтаро интихоб кун.");
+  return;
+ }
+
+ // Масофаи мустақим, на масофаи роҳ.
+ const straightKm=map.distance(
+  pickup,destination
+ )/1000;
+
+ // Танҳо намунаи тариф, на нархи расмӣ.
+ const baseFare=10;
+ const perKm=2;
+
+ estimatedFare=Math.max(
+  baseFare,
+  baseFare+straightKm*perKm
+ );
+
+ const commission=estimatedFare*0.05;
+ const driverEarning=estimatedFare-commission;
+
+ document.getElementById("result").innerHTML=`
+  Масофаи мустақим:
+  <b>${straightKm.toFixed(2)} км</b><br>
+  Нархи тахминӣ:
+  <b>${estimatedFare.toFixed(2)} сомонӣ</b><br>
+  Комиссияи FoodTJ (5%):
+  <b>${commission.toFixed(2)} сомонӣ</b><br>
+  Ҳиссаи ронанда (95%):
+  <b>${driverEarning.toFixed(2)} сомонӣ</b><br>
+  <small>
+  Ин ҳисоб танҳо намунавӣ аст.
+  Масофаи воқеии роҳ метавонад дигар бошад.
+  </small>
+ `;
+}
+
+function showOrderMessage(){
+ document.getElementById("orderMessage")
+  .textContent=
+  "Ин версияи озмоишӣ аст. "+
+  "Барои қабули фармоишҳои воқеӣ "+
+  "пайвасти бехатари Supabase лозим аст.";
+}
+</script>
+</body>
+</html>
