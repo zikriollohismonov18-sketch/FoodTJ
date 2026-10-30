@@ -108,6 +108,7 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
   </section>
 
   <div id="notice" class="notice hidden" role="status"></div>
+  <div id="foodtjConnectionStatus" class="muted small" role="status" style="margin:0 0 12px">Пайвастшавӣ санҷида мешавад...</div>
 
   <section id="authPanel" class="card hidden">
     <div class="section-head"><h2 id="authTitle">Вуруд ба FoodTJ</h2><button class="secondary" id="closeAuth">Пӯшидан</button></div>
@@ -239,7 +240,7 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
   </section>
 
   <!-- ============================================================
-       ПАНЕЛИ АДМИНИСТРАТОР — ПУРРА ИВАЗ ШУД
+       ПАНЕЛИ АДМИНИСТРАТОР — ПУРРА
        ============================================================ -->
   <section id="adminSection" class="section hidden">
 
@@ -438,9 +439,6 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
     </div>
 
   </section>
-  <!-- ============================================================
-       ТАМОМИ ПАНЕЛИ АДМИНИСТРАТОР
-       ============================================================ -->
 
   <div class="footer">FoodTJ • Версияи аввал • Душанбе, Тоҷикистон</div>
 </main>
@@ -633,19 +631,29 @@ function requireLogin(){ if(!currentUser){ toggle('authPanel',true); $('authPane
 
 /* ---------- Инициализатсия ---------- */
 async function init(){
+  renderPublicCatalog();
   if(!validConfig()){
-    $('restaurants').innerHTML = '<div class="empty">Аввал URL ва publishable/anon key-и Supabase-и FoodTJ-ро дар аввали index.html гузоред.</div>';
+    $('foodtjConnectionStatus').textContent = 'Supabase: URL ё key нодуруст';
+    $('restaurants').innerHTML = '<div class="empty">URL ё publishable key-и Supabase нодуруст аст. Танзимоти index.html-ро санҷед.</div>';
+    $('foodCatalogGrid').innerHTML = '<div class="empty">Каталог: пайвастшавӣ ба Supabase танзим нашудааст.</div>';
     return;
   }
   try {
+    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+      throw new Error('Китобхонаи Supabase бор нашуд. Интернет ё CDN-ро санҷед.');
+    }
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    $('foodtjConnectionStatus').textContent = 'Supabase: китобхона бор шуд · пайвастшавӣ санҷида мешавад';
     const { data:{session}, error } = await sb.auth.getSession();
     if(error) showNotice(error.message,'error');
+    $('foodtjConnectionStatus').textContent = 'Supabase: пайваст шуд · ' + (session ? 'корбар ворид шудааст' : 'барои воридшавӣ омода');
     if(session) await loadProfile(session.user);
 
-    await loadRestaurants();
-    renderPublicCatalog();
-    await loadFoodCatalog();
+    // Ҳар қисми саҳифа мустақил бор мешавад: хатои як қисм дигаронро намебандад.
+    const tasks = await Promise.allSettled([loadRestaurants(), loadFoodCatalog()]);
+    for (const result of tasks) {
+      if (result.status === 'rejected') console.error('FoodTJ load:', result.reason);
+    }
 
     sb.auth.onAuthStateChange((_event, session) => {
       setTimeout(async () => {
@@ -655,7 +663,9 @@ async function init(){
     });
   } catch(e) {
     console.error('init error:', e);
-    $('restaurants').innerHTML = '<div class="empty">Хатои инициализатсия: ' + esc(e.message) + '</div>';
+    $('foodtjConnectionStatus').textContent = 'Supabase: хато — ' + String(e.message || e);
+    $('restaurants').innerHTML = '<div class="empty">Хатои инициализатсия: ' + esc(e.message || e) + '</div>';
+    $('foodCatalogGrid').innerHTML = '<div class="empty">Пайвастшавӣ иҷро нашуд. Хатои болоро бинед.</div>';
   }
 }
 function resetSession(){
@@ -990,7 +1000,7 @@ function adminStatus(value){
     ready_for_pickup:'Интизорӣ барои курьер',
     picked_up:'Курьер гирифт',
     delivering:'Дар роҳ',
-    delivered:'Рассида шуд',
+    delivered:'Расонида шуд',
     cancelled:'Бекор шуд',
     pending:'Дар интизорӣ',
     approved:'Тасдиқ шуд',
