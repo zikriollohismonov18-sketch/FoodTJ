@@ -1,0 +1,694 @@
+
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FoodTJ — Дархостҳои нақш</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --bg:#0b111a;
+      --panel:#172230;
+      --border:#304152;
+      --text:#f4f6fa;
+      --muted:#aab8c7;
+      --orange:#ff842e;
+      --green:#22c55e;
+      --red:#ef4444;
+    }
+
+    * {box-sizing:border-box}
+
+    body {
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Arial,sans-serif;
+    }
+
+    header {
+      background:#121d29;
+      padding:22px 15px;
+      text-align:center;
+      border-bottom:1px solid var(--border);
+    }
+
+    header h1 {
+      color:var(--orange);
+      margin:0 0 8px;
+    }
+
+    a {color:#ffb278}
+
+    main {
+      max-width:900px;
+      margin:25px auto;
+      padding:15px;
+    }
+
+    .card {
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:15px;
+      padding:20px;
+      margin-bottom:20px;
+    }
+
+    h2 {margin-top:0}
+
+    input,select,button {
+      font:inherit;
+      border-radius:9px;
+      padding:12px;
+    }
+
+    input,select {
+      width:100%;
+      background:#0f1925;
+      border:1px solid #425469;
+      color:white;
+      margin:8px 0;
+    }
+
+    button {
+      background:var(--orange);
+      border:0;
+      color:#171717;
+      font-weight:bold;
+      cursor:pointer;
+      margin:5px 5px 5px 0;
+    }
+
+    button:disabled {
+      opacity:.5;
+      cursor:not-allowed;
+    }
+
+    .danger {
+      background:var(--red);
+      color:white;
+    }
+
+    .secondary {
+      background:#334155;
+      color:white;
+    }
+
+    .item {
+      padding:15px 0;
+      border-bottom:1px solid var(--border);
+      overflow-wrap:anywhere;
+    }
+
+    .muted {color:var(--muted)}
+    .success {color:#4ade80}
+    .error {color:#fb7185}
+
+    .status {
+      display:inline-block;
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:5px 10px;
+      margin:5px 0;
+    }
+
+    [hidden] {display:none!important}
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>FoodTJ</h1>
+  <p>Системаи дархостҳои нақш</p>
+  <a href="./index.html">Бозгашт ба FoodTJ</a>
+</header>
+
+<main>
+
+  <section class="card">
+    <h2>Ҳисоби корбар</h2>
+    <p id="accountInfo">Санҷиши ҳисоб...</p>
+
+    <div id="loginForm">
+      <input
+        id="email"
+        type="email"
+        placeholder="Email"
+        autocomplete="email"
+      >
+
+      <input
+        id="password"
+        type="password"
+        placeholder="Парол"
+        autocomplete="current-password"
+      >
+
+      <button id="loginBtn">Ворид шудан</button>
+    </div>
+
+    <button id="logoutBtn" class="secondary" hidden>
+      Баромадан
+    </button>
+  </section>
+
+  <section class="card" id="requestSection" hidden>
+    <h2>Дархости нақши нав</h2>
+
+    <p class="muted">
+      Агар мехоҳед ҳамчун курьер ё соҳиби ресторан
+      фаъолият кунед, дархост фиристед.
+    </p>
+
+    <label for="requestedRole">Нақшро интихоб кунед:</label>
+
+    <select id="requestedRole">
+      <option value="courier">Курьер</option>
+      <option value="restaurant">Соҳиби ресторан</option>
+    </select>
+
+    <button id="sendRequest">
+      Фиристодани дархост
+    </button>
+
+    <h3>Дархостҳои ман</h3>
+    <div id="myRequests"></div>
+  </section>
+
+  <section class="card" id="adminSection" hidden>
+    <h2>Панели Super Admin</h2>
+
+    <label for="statusFilter">Филтр:</label>
+
+    <select id="statusFilter">
+      <option value="pending">Интизорӣ</option>
+      <option value="approved">Тасдиқшуда</option>
+      <option value="rejected">Радшуда</option>
+      <option value="all">Ҳама</option>
+    </select>
+
+    <button id="refreshAdmin" class="secondary">
+      Навсозӣ
+    </button>
+
+    <div id="adminRequests"></div>
+  </section>
+
+  <p id="message" role="status"></p>
+
+</main>
+
+<script>
+"use strict";
+
+// ======================================
+// 1. SUPABASE
+// ======================================
+
+const SUPABASE_URL =
+  "https://rgminzzmlktkliliiupt.supabase.co";
+
+// Танҳо anon ё publishable key.
+// Secret key ва service_role манъ аст.
+const SUPABASE_ANON_KEY =
+  "YOUR_SUPABASE_ANON_KEY";
+
+const $ = id => document.getElementById(id);
+
+let sb = null;
+let currentUser = null;
+let isSuperAdmin = false;
+
+function showMessage(text, isError = false) {
+  $("message").textContent = text;
+  $("message").className = isError
+    ? "error"
+    : "success";
+}
+
+function esc(value) {
+  return String(value ?? "").replace(
+    /[&<>"']/g,
+    ch => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    })[ch]
+  );
+}
+
+function roleLabel(role) {
+  const labels = {
+    customer:"Муштарӣ",
+    courier:"Курьер",
+    restaurant:"Соҳиби ресторан",
+    admin:"Администратор"
+  };
+
+  return labels[role] || role;
+}
+
+function statusLabel(status) {
+  const labels = {
+    pending:"Интизорӣ",
+    approved:"Тасдиқшуда",
+    rejected:"Радшуда"
+  };
+
+  return labels[status] || status;
+}
+
+function dateLabel(date) {
+  if (!date) return "";
+
+  const d = new Date(date);
+
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleString("tg-TJ");
+}
+
+// ======================================
+// 2. AUTH
+// ======================================
+
+async function initialize() {
+  if (
+    !SUPABASE_ANON_KEY ||
+    SUPABASE_ANON_KEY === "YOUR_SUPABASE_ANON_KEY"
+  ) {
+    $("accountInfo").textContent =
+      "Танзими Supabase лозим аст.";
+
+    showMessage(
+      "Калиди оммавии Supabase-ро дар код гузоред.",
+      true
+    );
+
+    return;
+  }
+
+  if (!window.supabase) {
+    showMessage(
+      "Китобхонаи Supabase бор нашуд.",
+      true
+    );
+    return;
+  }
+
+  sb = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+  sb.auth.onAuthStateChange(() => {
+    // Ба auth callback дархости Supabase
+    // намефиристем, то deadlock нашавад.
+    setTimeout(refreshSession, 0);
+  });
+
+  await refreshSession();
+}
+
+async function refreshSession() {
+  if (!sb) return;
+
+  const {data,error} = await sb.auth.getUser();
+
+  if (error && !data?.user) {
+    currentUser = null;
+  } else {
+    currentUser = data?.user || null;
+  }
+
+  $("loginForm").hidden = !!currentUser;
+  $("logoutBtn").hidden = !currentUser;
+  $("requestSection").hidden = !currentUser;
+
+  if (!currentUser) {
+    $("accountInfo").textContent =
+      "Шумо ворид нашудаед.";
+
+    $("adminSection").hidden = true;
+    isSuperAdmin = false;
+    return;
+  }
+
+  $("accountInfo").textContent =
+    currentUser.email || currentUser.id;
+
+  const {data:adminResult,error:adminError} =
+    await sb.rpc("is_super_admin");
+
+  isSuperAdmin =
+    !adminError && adminResult === true;
+
+  $("adminSection").hidden = !isSuperAdmin;
+
+  await loadMyRequests();
+
+  if (isSuperAdmin) {
+    await loadAdminRequests();
+  }
+}
+
+async function login() {
+  if (!sb) return;
+
+  const email = $("email").value.trim();
+  const password = $("password").value;
+
+  if (!email || !password) {
+    showMessage(
+      "Email ва паролро ворид кунед.",
+      true
+    );
+    return;
+  }
+
+  $("loginBtn").disabled = true;
+
+  try {
+    const {error} =
+      await sb.auth.signInWithPassword({
+        email,
+        password
+      });
+
+    if (error) throw error;
+
+    $("password").value = "";
+    showMessage("Воридшавӣ муваффақ шуд.");
+
+    await refreshSession();
+  } catch (err) {
+    showMessage(err.message, true);
+  } finally {
+    $("loginBtn").disabled = false;
+  }
+}
+
+async function logout() {
+  if (!sb) return;
+
+  const {error} = await sb.auth.signOut();
+
+  if (error) {
+    showMessage(error.message, true);
+    return;
+  }
+
+  showMessage("Шумо аз ҳисоб баромадед.");
+  await refreshSession();
+}
+
+// ======================================
+// 3. ROLE REQUESTS
+// ======================================
+
+async function sendRoleRequest() {
+  if (!currentUser) {
+    showMessage(
+      "Аввал ба ҳисоб ворид шавед.",
+      true
+    );
+    return;
+  }
+
+  const requestedRole = $("requestedRole").value;
+
+  if (
+    !["courier","restaurant"].includes(requestedRole)
+  ) {
+    showMessage("Нақши нодуруст.", true);
+    return;
+  }
+
+  $("sendRequest").disabled = true;
+
+  try {
+    // Пешгирии дархости такрорӣ
+    const {data:existing,error:checkError} =
+      await sb
+        .from("foodtj_role_requests")
+        .select("id")
+        .eq("user_id", currentUser.id)
+        .eq("status", "pending")
+        .limit(1);
+
+    if (checkError) throw checkError;
+
+    if (existing?.length) {
+      showMessage(
+        "Шумо аллакай дархости интизорӣ доред.",
+        true
+      );
+      return;
+    }
+
+    const {error} = await sb
+      .from("foodtj_role_requests")
+      .insert({
+        user_id:currentUser.id,
+        requested_role:requestedRole
+      });
+
+    if (error) throw error;
+
+    showMessage(
+      "Дархости шумо бомуваффақият фиристода шуд."
+    );
+
+    await loadMyRequests();
+
+    if (isSuperAdmin) {
+      await loadAdminRequests();
+    }
+
+  } catch (err) {
+    showMessage(err.message, true);
+  } finally {
+    $("sendRequest").disabled = false;
+  }
+}
+
+async function loadMyRequests() {
+  if (!currentUser) return;
+
+  const {data,error} = await sb
+    .from("foodtj_role_requests")
+    .select(
+      "id,requested_role,status,created_at"
+    )
+    .eq("user_id", currentUser.id)
+    .order("created_at", {
+      ascending:false
+    })
+    .limit(100);
+
+  if (error) {
+    $("myRequests").textContent = error.message;
+    return;
+  }
+
+  $("myRequests").innerHTML =
+    (data || []).map(request => `
+      <div class="item">
+        <strong>
+          ${esc(roleLabel(request.requested_role))}
+        </strong>
+
+        <p>
+          Ҳолат:
+          <span class="status">
+            ${esc(statusLabel(request.status))}
+          </span>
+        </p>
+
+        <small class="muted">
+          ${esc(dateLabel(request.created_at))}
+        </small>
+      </div>
+    `).join("") ||
+    '<p class="muted">Дархост нест.</p>';
+}
+
+// ======================================
+// 4. SUPER ADMIN
+// ======================================
+
+async function loadAdminRequests() {
+  if (!isSuperAdmin) return;
+
+  const filter = $("statusFilter").value;
+
+  let query = sb
+    .from("foodtj_role_requests")
+    .select(
+      "id,user_id,requested_role,status,created_at"
+    )
+    .order("created_at", {
+      ascending:false
+    })
+    .limit(100);
+
+  if (filter !== "all") {
+    query = query.eq("status", filter);
+  }
+
+  const {data,error} = await query;
+
+  if (error) {
+    $("adminRequests").textContent =
+      error.message;
+    return;
+  }
+
+  $("adminRequests").innerHTML =
+    (data || []).map(request => `
+      <div class="item">
+
+        <p>
+          <strong>Корбар:</strong>
+          ${esc(request.user_id)}
+        </p>
+
+        <p>
+          <strong>Нақши дархостшуда:</strong>
+          ${esc(roleLabel(request.requested_role))}
+        </p>
+
+        <p>
+          <strong>Ҳолат:</strong>
+          ${esc(statusLabel(request.status))}
+        </p>
+
+        <p class="muted">
+          ${esc(dateLabel(request.created_at))}
+        </p>
+
+        ${
+          request.status === "pending"
+          ? `
+            <button
+              data-request-id="${esc(request.id)}"
+              data-decision="approved">
+              Тасдиқ
+            </button>
+
+            <button
+              class="danger"
+              data-request-id="${esc(request.id)}"
+              data-decision="rejected">
+              Рад
+            </button>
+          `
+          : ""
+        }
+
+      </div>
+    `).join("") ||
+    '<p class="muted">Дархост нест.</p>';
+}
+
+async function reviewRoleRequest(id, decision) {
+  if (!isSuperAdmin) {
+    showMessage("Иҷозат нест.", true);
+    return;
+  }
+
+  if (!["approved","rejected"].includes(decision)) {
+    return;
+  }
+
+  const confirmed = confirm(
+    decision === "approved"
+      ? "Ин дархостро тасдиқ мекунед?"
+      : "Ин дархостро рад мекунед?"
+  );
+
+  if (!confirmed) return;
+
+  const {error} = await sb.rpc(
+    "foodtj_review_role_request",
+    {
+      p_request_id:id,
+      p_decision:decision
+    }
+  );
+
+  if (error) {
+    showMessage(error.message, true);
+    return;
+  }
+
+  showMessage(
+    decision === "approved"
+      ? "Нақш тасдиқ шуд."
+      : "Дархост рад шуд."
+  );
+
+  await loadAdminRequests();
+  await loadMyRequests();
+}
+
+// ======================================
+// 5. EVENTS
+// ======================================
+
+$("loginBtn").addEventListener(
+  "click",
+  login
+);
+
+$("logoutBtn").addEventListener(
+  "click",
+  logout
+);
+
+$("sendRequest").addEventListener(
+  "click",
+  sendRoleRequest
+);
+
+$("refreshAdmin").addEventListener(
+  "click",
+  loadAdminRequests
+);
+
+$("statusFilter").addEventListener(
+  "change",
+  loadAdminRequests
+);
+
+$("adminRequests").addEventListener(
+  "click",
+  event => {
+    const button = event.target.closest(
+      "[data-request-id][data-decision]"
+    );
+
+    if (!button) return;
+
+    reviewRoleRequest(
+      button.dataset.requestId,
+      button.dataset.decision
+    );
+  }
+);
+
+// ======================================
+// 6. START
+// ======================================
+
+initialize();
+
+</script>
+</body>
+</html>
