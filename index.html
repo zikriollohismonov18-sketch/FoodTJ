@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tg">
 <head>
@@ -7,78 +8,556 @@
 <title>FoodTJ — расонидани хӯрок</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#f4f6fa;--panel:#fff;--ink:#172033;--muted:#697386;--line:#e3e8f0;--green:#16a34a;--dark:#111827;--red:#dc2626;--orange:#f97316}
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}button,input,textarea,select{font:inherit}button{border:0;border-radius:10px;padding:11px 15px;background:var(--green);color:#fff;font-weight:700;cursor:pointer}button.secondary{background:#e8edf5;color:var(--ink)}button.danger{background:var(--red)}button:disabled{opacity:.55;cursor:not-allowed}.top{background:var(--dark);color:white;padding:16px 4%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.brand{font-size:24px;font-weight:900;letter-spacing:-.6px}.brand span{color:#4ade80}.top small{color:#cbd5e1}.top-actions{display:flex;gap:8px;flex-wrap:wrap}.top-actions button.secondary{background:#273449;color:white}.wrap{max-width:1150px;margin:0 auto;padding:22px 16px 60px}.hero{background:linear-gradient(120deg,#052e16,#166534);color:white;border-radius:20px;padding:28px;margin-bottom:22px;display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:center}.hero h1{font-size:clamp(28px,5vw,44px);line-height:1.1;margin:0 0 12px}.hero p{color:#dcfce7;line-height:1.6;margin:0}.hero .emoji{font-size:76px;text-align:center}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 18px}.toolbar input{flex:1;min-width:190px}.field, input,textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:white;color:var(--ink)}textarea{min-height:80px;resize:vertical}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:15px}.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:0 4px 14px #0f172a08}.card h3{margin:0 0 7px}.muted{color:var(--muted);font-size:14px}.pill{display:inline-block;background:#dcfce7;color:#166534;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:700}.pill.gray{background:#edf0f5;color:#475569}.section{margin-top:25px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.section h2{font-size:22px;margin:0 0 12px}.hidden{display:none!important}.stack{display:grid;gap:10px}.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.row>*{flex:1}.row button{flex:0 0 auto}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.formgrid .full{grid-column:1/-1}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.tabs button{background:#e8edf5;color:#334155}.tabs button.active{background:var(--dark);color:white}.notice{padding:12px 14px;border-radius:10px;background:#eff6ff;color:#1e40af;margin:12px 0;white-space:pre-wrap}.notice.error{background:#fef2f2;color:#991b1b}.notice.success{background:#f0fdf4;color:#166534}.item{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:12px 0}.item:last-child{border-bottom:0}.price{font-weight:800;white-space:nowrap}.cartbar{position:sticky;bottom:12px;background:#111827;color:white;border-radius:14px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;box-shadow:0 8px 24px #0002}.cartbar small{color:#cbd5e1}.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:32px}.status{font-weight:700;color:#166534}.empty{padding:28px;text-align:center;color:var(--muted);background:white;border:1px dashed #cbd5e1;border-radius:14px}.small{font-size:12px}.order-card{margin-bottom:12px}.menu-actions{display:flex;gap:8px;align-items:center}.menu-actions input{width:70px;flex:0 0 70px}.danger-text{color:#b91c1c}a{color:var(--green);font-weight:700;text-decoration:none}a:hover{text-decoration:underline}
-@media(max-width:650px){.hero{grid-template-columns:1fr;padding:22px}.hero .emoji{display:none}.formgrid{grid-template-columns:1fr}.top{padding:14px}.wrap{padding:16px 12px 45px}.cartbar{align-items:flex-start;flex-direction:column}.top-actions{width:100%}.top-actions button{flex:1}}
+:root{
+  --bg:#f4f7fc;
+  --panel:#fff;
+  --ink:#111c2f;
+  --muted:#61718b;
+  --line:#e6edf6;
+  --green:#16a34a;
+  --dark:#111b2b;
+  --red:#ef4444;
+  --orange:#ff7626;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+}
+button,input,textarea,select{font:inherit}
+button{
+  border:0;
+  border-radius:10px;
+  padding:11px 15px;
+  background:#ff7626;
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+}
+button:hover{filter:brightness(.97)}
+button.secondary{background:#eff3f9;color:#40536f}
+button.danger{background:var(--red)}
+button:disabled{opacity:.55;cursor:not-allowed}
+input,textarea,select,.field{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:11px 12px;
+  background:white;
+  color:var(--ink);
+}
+textarea{min-height:80px;resize:vertical}
+a{color:var(--green);font-weight:700;text-decoration:none}
+a:hover{text-decoration:underline}
+.hidden{display:none!important}
+.muted{color:var(--muted);font-size:14px}
+.small{font-size:12px}
+.stack{display:grid;gap:10px}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.row>*{flex:1}
+.row button{flex:0 0 auto}
+.formgrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.formgrid .full{grid-column:1/-1}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:16px;
+}
+.card{
+  background:white;
+  border:1px solid #e8eef6;
+  border-radius:15px;
+  padding:17px;
+  box-shadow:0 4px 18px #1d35570a;
+}
+.card h3{margin:0 0 7px}
+.section{margin-top:25px}
+.section h2{font-size:22px;margin:0 0 12px}
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.section-head h2{font-size:26px;letter-spacing:-.5px}
+.pill{
+  display:inline-block;
+  background:#dcfce9;
+  color:#168044;
+  border-radius:999px;
+  padding:4px 9px;
+  font-size:12px;
+  font-weight:700;
+}
+.pill.gray{background:#eaf0f8;color:#51627e}
+.notice{
+  padding:12px 14px;
+  border-radius:12px;
+  background:#eff6ff;
+  color:#1e40af;
+  margin:12px 0;
+  white-space:pre-wrap;
+}
+.notice.error{background:#fef2f2;color:#991b1b}
+.notice.success{background:#f0fdf4;color:#166534}
+.empty{
+  padding:28px;
+  text-align:center;
+  color:var(--muted);
+  background:white;
+  border:1px dashed #d7e1ee;
+  border-radius:14px;
+}
+.item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  border-bottom:1px solid #eaf0f7;
+  padding:12px 0;
+}
+.item:last-child{border-bottom:0}
+.price{font-weight:800;white-space:nowrap}
+.status{font-weight:700;color:#166534}
+.danger-text{color:#b91c1c}
+.order-card{margin-bottom:12px}
+.menu-actions{display:flex;gap:8px;align-items:center}
+.menu-actions input{width:70px;flex:0 0 70px}
+.toolbar{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:14px 0 18px;
+}
+.toolbar input{flex:1;min-width:190px}
+.toolbar input,.toolbar select,.field{
+  border-color:#e0e8f3;
+  border-radius:11px;
+  min-height:46px;
+}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.tabs button{background:#e8edf5;color:#334155}
+.tabs button.active{background:#ff7626;color:white}
+.cartbar{
+  position:sticky;
+  bottom:12px;
+  background:#111827;
+  color:white;
+  border-radius:14px;
+  padding:14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:18px;
+  box-shadow:0 8px 24px #0002;
+}
+.cartbar small{color:#cbd5e1}
+.footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  margin-top:35px;
+}
 
-/* ===== FoodTJ dashboard refresh ===== */
-:root{--bg:#f4f7fc;--panel:#fff;--ink:#111c2f;--muted:#61718b;--line:#e6edf6;--green:#16a34a;--dark:#111b2b;--red:#ef4444;--orange:#ff7626}
-body{background:#f4f7fc;color:var(--ink)}
-.top{position:relative;margin-left:272px;min-height:70px;padding:14px 28px;background:#1c2737;border-bottom:1px solid #273447;box-shadow:0 4px 20px #1420330a}
-.top>div:first-child{display:flex;align-items:center;gap:14px}.brand{font-size:26px;letter-spacing:-.7px}.brand:before{content:'👨‍🍳';display:inline-flex;align-items:center;justify-content:center;margin-right:9px;font-size:27px}.brand span{color:#ff7626}.top small{color:#c9d4e3;font-size:14px}.top-actions button.secondary{background:#27364a;border:1px solid #3a4960;color:#eef4ff}
-.foodtj-sidebar{position:fixed;z-index:20;inset:0 auto 0 0;width:272px;background:linear-gradient(180deg,#151f2e,#101927);color:#d8e1ee;display:flex;flex-direction:column;padding:0 14px 18px;border-right:1px solid #263347;overflow-y:auto}
-.foodtj-side-brand{height:82px;display:flex;align-items:center;padding:0 18px;border-bottom:1px solid #29364a;margin:0 -14px 18px;font-size:28px;font-weight:900;color:#fff;letter-spacing:-.8px}.foodtj-side-brand span{color:#ff7626}.foodtj-nav{display:grid;gap:7px}.foodtj-nav a{display:flex;align-items:center;gap:14px;padding:14px 15px;border-radius:12px;color:#cbd6e5;text-decoration:none;font-weight:650;transition:.18s}.foodtj-nav a:hover{background:#26354a;color:#fff;text-decoration:none}.foodtj-nav a.active{background:#ff7626;color:white;box-shadow:0 7px 18px #ff762633}.foodtj-nav .nav-ico{width:22px;text-align:center;font-size:20px}.foodtj-side-bottom{margin-top:auto;border:1px solid #314057;border-radius:14px;padding:16px;margin-top:35px;background:#172334}.foodtj-side-bottom strong{display:block;color:#fff;font-size:18px;margin-bottom:7px}.foodtj-side-bottom p{font-size:12px;line-height:1.6;color:#c3cfdf;margin:0}.foodtj-side-bottom .copyright{margin-top:22px;color:#8795a9;font-size:11px}
-.wrap{max-width:none;margin:0 0 0 272px;padding:28px 26px 55px}.hero{background:linear-gradient(120deg,#ff7626,#ff8b36);border-radius:18px;padding:26px 30px;box-shadow:0 10px 25px #ff76261a}.hero p{color:#fff4eb}.hero .emoji{font-size:65px}.section{margin-top:25px}.section-head h2{font-size:26px;letter-spacing:-.5px}.card{border:1px solid #e8eef6;border-radius:15px;box-shadow:0 4px 18px #1d35570a;padding:17px}.grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}.toolbar input,.toolbar select,.field{border-color:#e0e8f3;border-radius:11px;min-height:46px}.toolbar button,button{background:#ff7626;border-radius:10px;box-shadow:none}button:hover{filter:brightness(.97)}button.secondary{background:#eff3f9;color:#40536f}.tabs button.active{background:#ff7626}.pill{background:#dcfce9;color:#168044}.pill.gray{background:#eaf0f8;color:#51627e}.notice{border-radius:12px}.empty{border-radius:14px;background:#fff;border-color:#d7e1ee}.footer{margin-top:35px}
-#foodCatalogSection .section-head{align-items:center;margin-bottom:7px}#foodCatalogSection .section-head h2{margin:0}#foodCatalogSection>p.muted{margin:6px 0 18px}#foodCatalogSection .toolbar{display:grid;grid-template-columns:minmax(200px,1fr) minmax(180px,230px) auto;gap:12px;margin:18px 0 20px}#foodCatalogGrid .card{padding:9px 9px 13px;overflow:hidden;min-width:0}#foodCatalogGrid .card img,#foodCatalogGrid .food-photo{width:100%;height:130px;object-fit:cover;border-radius:10px;display:block;background:#f0f3f8}#foodCatalogGrid .food-photo{display:flex;align-items:center;justify-content:center;font-size:54px;background:linear-gradient(135deg,#fff0e5,#f5f7fb)}#foodCatalogGrid .pill{display:inline-block;margin:10px 7px 5px;padding:4px 9px;font-size:11px;background:#ffedcf;color:#8b4b00}#foodCatalogGrid h3{margin:5px 7px;font-size:16px}#foodCatalogGrid .muted{margin:5px 7px}#foodCatalogGrid .price{margin:8px 7px;color:#ff7626;font-size:15px}#foodCatalogGrid .small{font-size:11px}#foodCatalogGrid .card .muted.small{padding:8px;background:#f7f9fc;border-radius:8px}
-#restaurantSection .card,#publicCatalogGrid .card{padding:20px}#adminSection .card{margin-top:12px}.item{border-color:#eaf0f7}
-body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #publicCatalogSection{display:none!important}body.admin-mode #foodCatalogSection{margin-top:0}body.admin-mode #foodCatalogSection .section-head h2:before{content:'🍽️';display:inline-flex;align-items:center;justify-content:center;width:54px;height:54px;margin-right:16px;background:#ff7626;color:white;border-radius:16px;font-size:26px;vertical-align:middle}body.admin-mode #foodCatalogSection .section-head{margin-bottom:15px}
-@media(max-width:850px){.foodtj-sidebar{width:78px;padding:0 8px 12px}.foodtj-side-brand{justify-content:center;padding:0;margin:0 -8px 14px;font-size:0;height:70px}.foodtj-side-brand span{display:none}.foodtj-side-brand:before{font-size:28px;content:'👨‍🍳'}.foodtj-nav a{justify-content:center;padding:13px 5px}.foodtj-nav a .nav-label{display:none}.foodtj-nav .nav-ico{font-size:22px}.foodtj-side-bottom{display:none}.top{margin-left:78px;padding:13px 16px}.wrap{margin-left:78px;padding:20px 14px 40px}#foodCatalogSection .toolbar{grid-template-columns:1fr 1fr}#foodCatalogSection .toolbar button{grid-column:1/-1}}
-@media(max-width:560px){.foodtj-sidebar{position:sticky;top:0;width:100%;height:auto;inset:auto;display:block;padding:7px;background:#111b2b}.foodtj-side-brand{display:none}.foodtj-nav{display:flex;overflow-x:auto;gap:5px}.foodtj-nav a{flex:0 0 auto;padding:10px 12px;font-size:12px}.foodtj-nav a .nav-label{display:inline}.foodtj-nav .nav-ico{font-size:16px;width:auto}.top{margin-left:0;min-height:60px;padding:12px 14px}.top>div:first-child{gap:8px;flex-wrap:wrap}.brand{font-size:22px}.top small{font-size:12px}.wrap{margin-left:0;padding:16px 11px 35px}.hero{padding:20px}.section-head h2{font-size:22px}#foodCatalogSection .toolbar{grid-template-columns:1fr}#foodCatalogSection .toolbar button{grid-column:auto}#foodCatalogGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#foodCatalogGrid .card img,#foodCatalogGrid .food-photo{height:105px}#foodCatalogGrid h3{font-size:14px}.top-actions{width:auto}.top-actions button{padding:8px 10px;font-size:12px}}
+/* Менюи паҳлӯӣ */
+.foodtj-sidebar{
+  position:fixed;
+  z-index:20;
+  inset:0 auto 0 0;
+  width:272px;
+  background:linear-gradient(180deg,#151f2e,#101927);
+  color:#d8e1ee;
+  display:flex;
+  flex-direction:column;
+  padding:0 14px 18px;
+  border-right:1px solid #263347;
+  overflow-y:auto;
+}
+.foodtj-side-brand{
+  height:82px;
+  display:flex;
+  align-items:center;
+  padding:0 18px;
+  border-bottom:1px solid #29364a;
+  margin:0 -14px 18px;
+  font-size:28px;
+  font-weight:900;
+  color:white;
+}
+.foodtj-side-brand span{color:#ff7626}
+.foodtj-nav{display:grid;gap:7px}
+.foodtj-nav a{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:14px 15px;
+  border-radius:12px;
+  color:#cbd6e5;
+  text-decoration:none;
+  font-weight:650;
+}
+.foodtj-nav a:hover{background:#26354a;color:white}
+.foodtj-nav a.active{
+  background:#ff7626;
+  color:white;
+  box-shadow:0 7px 18px #ff762633;
+}
+.foodtj-nav .nav-ico{
+  width:22px;
+  text-align:center;
+  font-size:20px;
+}
+.foodtj-side-bottom{
+  margin-top:auto;
+  border:1px solid #314057;
+  border-radius:14px;
+  padding:16px;
+  background:#172334;
+}
+.foodtj-side-bottom strong{
+  display:block;
+  color:white;
+  font-size:18px;
+  margin-bottom:7px;
+}
+.foodtj-side-bottom p{
+  font-size:12px;
+  line-height:1.6;
+  color:#c3cfdf;
+  margin:0;
+}
+.foodtj-side-bottom .copyright{
+  margin-top:22px;
+  color:#8795a9;
+  font-size:11px;
+}
 
-#walletSection .wallet-card{background:linear-gradient(120deg,#14532d,#16a34a);color:#fff;border-radius:18px;padding:24px;max-width:680px;box-shadow:0 12px 28px #16653422}
-#walletSection .wallet-top{display:flex;align-items:center;justify-content:space-between;gap:15px}
+/* Қисми боло */
+.top{
+  position:relative;
+  margin-left:272px;
+  min-height:70px;
+  padding:14px 28px;
+  background:#1c2737;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.top>div:first-child{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.brand{font-size:26px;font-weight:900;letter-spacing:-.7px}
+.brand:before{content:'👨‍🍳';margin-right:9px}
+.brand span{color:#ff7626}
+.top small{color:#c9d4e3;font-size:14px}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+.top-actions button.secondary{
+  background:#27364a;
+  border:1px solid #3a4960;
+  color:#eef4ff;
+}
+.wrap{margin:0 0 0 272px;padding:28px 26px 55px}
+.hero{
+  background:linear-gradient(120deg,#ff7626,#ff8b36);
+  color:white;
+  border-radius:18px;
+  padding:26px 30px;
+  margin-bottom:22px;
+  display:grid;
+  grid-template-columns:1.5fr 1fr;
+  gap:18px;
+  align-items:center;
+}
+.hero h1{
+  font-size:clamp(28px,5vw,44px);
+  line-height:1.1;
+  margin:0 0 12px;
+}
+.hero p{color:#fff4eb;line-height:1.6;margin:0}
+.hero .emoji{font-size:65px;text-align:center}
+
+/* Каталоги хӯрок */
+#foodCatalogSection .section-head{margin-bottom:7px}
+#foodCatalogSection .section-head h2{margin:0}
+#foodCatalogSection .toolbar{
+  display:grid;
+  grid-template-columns:minmax(200px,1fr) minmax(180px,230px) auto;
+  gap:12px;
+  margin:18px 0 20px;
+}
+#foodCatalogGrid .card{
+  padding:9px 9px 13px;
+  overflow:hidden;
+  min-width:0;
+}
+#foodCatalogGrid .card img,
+#foodCatalogGrid .food-photo{
+  width:100%;
+  height:130px;
+  object-fit:cover;
+  border-radius:10px;
+  display:block;
+  background:#f0f3f8;
+}
+#foodCatalogGrid .food-photo{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:54px;
+  background:linear-gradient(135deg,#fff0e5,#f5f7fb);
+}
+#foodCatalogGrid h3{margin:5px 7px;font-size:16px}
+#foodCatalogGrid .muted{margin:5px 7px}
+#foodCatalogGrid .price{
+  margin:8px 7px;
+  color:#ff7626;
+  font-size:15px;
+}
+
+/* Ҳамён */
+#walletSection .wallet-card{
+  background:linear-gradient(120deg,#14532d,#16a34a);
+  color:white;
+  border-radius:18px;
+  padding:24px;
+  max-width:680px;
+}
+#walletSection .wallet-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+}
 #walletSection .wallet-label{color:#dcfce7;font-size:14px}
-#walletSection .wallet-balance{font-size:clamp(30px,5vw,42px);font-weight:900;letter-spacing:-1px;margin-top:5px}
-#walletSection .wallet-icon{font-size:42px;background:#ffffff20;border-radius:16px;padding:12px}
+#walletSection .wallet-balance{
+  font-size:clamp(30px,5vw,42px);
+  font-weight:900;
+  margin-top:5px;
+}
+#walletSection .wallet-icon{font-size:42px}
 #walletSection .wallet-sub{color:#dcfce7;font-size:12px;margin-top:15px}
 #walletSection .wallet-form{margin-top:15px;max-width:900px}
-#walletSection .wallet-form h3{margin-top:0}
-#walletSection .wallet-entry{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
-#walletSection .wallet-entry:last-child{border-bottom:0}
+#walletSection .wallet-entry{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  padding:12px 0;
+  border-bottom:1px solid var(--line);
+}
 
-/* ===== FoodTJ Professional Admin Dashboard ===== */
-#adminSection{margin-top:0}
-.admin-header{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+/* Панели администратор */
+.admin-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-bottom:22px;
+}
 .admin-header h2{font-size:27px;margin:0}
-.admin-subtitle{color:var(--muted);font-size:13px;margin-top:5px}
-.admin-tabs{display:flex;gap:8px;overflow-x:auto;padding:5px 0 14px;margin-bottom:15px}
-.admin-tabs button{flex:0 0 auto;background:#fff;color:#40536f;border:1px solid var(--line);box-shadow:none}
-.admin-tabs button.active{background:#ff7626;color:white;border-color:#ff7626}
-.admin-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:14px;margin-bottom:20px}
-.admin-kpi{background:#fff;border:1px solid var(--line);border-radius:15px;padding:18px;box-shadow:0 4px 18px #1d35570a}
+.admin-subtitle{color:var(--muted);font-size:13px}
+.admin-tabs{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:5px 0 14px;
+  margin-bottom:15px;
+}
+.admin-tabs button{
+  flex:0 0 auto;
+  background:white;
+  color:#40536f;
+  border:1px solid var(--line);
+}
+.admin-tabs button.active{background:#ff7626;color:white}
+.admin-kpis{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(175px,1fr));
+  gap:14px;
+  margin-bottom:20px;
+}
+.admin-kpi{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:18px;
+}
 .admin-kpi .kpi-icon{font-size:25px}
 .admin-kpi .kpi-label{font-size:13px;color:var(--muted);margin-top:9px}
 .admin-kpi .kpi-value{font-size:25px;font-weight:900;margin-top:5px}
 .admin-panel{display:none}
 .admin-panel.active{display:block}
-.admin-panel-title{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:15px 0}
+.admin-panel-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:15px 0;
+}
 .admin-panel-title h3{margin:0;font-size:20px}
-.admin-table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:13px}
+.admin-table-wrap{
+  overflow-x:auto;
+  background:white;
+  border:1px solid var(--line);
+  border-radius:13px;
+}
 .admin-table{width:100%;border-collapse:collapse;min-width:650px}
-.admin-table th,.admin-table td{padding:13px;text-align:left;border-bottom:1px solid var(--line);font-size:13px}
+.admin-table th,.admin-table td{
+  padding:13px;
+  text-align:left;
+  border-bottom:1px solid var(--line);
+  font-size:13px;
+}
 .admin-table th{background:#f7f9fc;color:#61718b}
-.admin-table tr:last-child td{border-bottom:0}
-.admin-error{padding:13px;background:#fff1f2;color:#991b1b;border-radius:10px}
-.admin-info{padding:13px;background:#eff6ff;color:#1e40af;border-radius:10px;margin:12px 0}
-.admin-chart{background:#fff;border:1px solid var(--line);border-radius:15px;padding:18px;margin-top:15px}
-.admin-bar-row{display:grid;grid-template-columns:120px 1fr 70px;align-items:center;gap:10px;margin:13px 0;font-size:13px}
-.admin-bar-track{height:11px;background:#edf1f7;border-radius:20px;overflow:hidden}
-.admin-bar-fill{height:100%;background:#ff7626;border-radius:20px}
+.admin-error{padding:13px;background:#fff1f2;color:#991b1b}
+.admin-info{padding:13px;background:#eff6ff;color:#1e40af}
+.admin-chart{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:18px;
+  margin-top:15px;
+}
+.admin-bar-row{
+  display:grid;
+  grid-template-columns:120px 1fr 70px;
+  align-items:center;
+  gap:10px;
+  margin:13px 0;
+  font-size:13px;
+}
+.admin-bar-track{
+  height:11px;
+  background:#edf1f7;
+  border-radius:20px;
+  overflow:hidden;
+}
+.admin-bar-fill{height:100%;background:#ff7626}
 .admin-actions{display:flex;gap:8px;flex-wrap:wrap}
 .admin-status{font-size:12px;font-weight:700}
 .admin-refresh{background:#1c2737;color:white}
-@media(max-width:560px){
-  .admin-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-  .admin-kpi{padding:13px}
-  .admin-kpi .kpi-value{font-size:20px}
-  .admin-bar-row{grid-template-columns:85px 1fr 55px}
+
+/* Таҳлилҳо */
+.foodtj-analytics{margin:18px 0 22px}
+.foodtj-analytics-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(155px,1fr));
+  gap:12px;
+}
+.foodtj-metric{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+}
+.foodtj-metric small{
+  color:var(--muted);
+  display:block;
+  margin-bottom:8px;
+}
+.foodtj-metric strong{font-size:25px}
+.foodtj-chart-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
+  gap:14px;
+  margin-top:14px;
+}
+.foodtj-chart{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+}
+.foodtj-bars{
+  height:190px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:8px;
+  border-bottom:1px solid #d9e1ed;
+}
+.foodtj-bar-slot{
+  flex:1;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  gap:6px;
+}
+.foodtj-bar{
+  width:min(100%,44px);
+  min-height:2px;
+  border-radius:6px 6px 0 0;
+  background:#ff7626;
+}
+.foodtj-bar.profit{background:#16a34a}
+.foodtj-bar-value{font-size:11px;color:#42526b}
+.foodtj-axis{display:flex;justify-content:space-between;gap:8px}
+.foodtj-axis span{
+  flex:1;
+  text-align:center;
+  font-size:11px;
+  color:var(--muted);
 }
 
-/* Analytics: daily totals and seven-day chart */
-.foodtj-analytics{margin:18px 0 22px}.foodtj-analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}.foodtj-metric{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}.foodtj-metric small{color:var(--muted);display:block;margin-bottom:8px}.foodtj-metric strong{font-size:clamp(18px,2.5vw,25px)}.foodtj-chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;margin-top:14px}.foodtj-chart{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}.foodtj-chart h4{margin:0 0 14px}.foodtj-bars{height:190px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;border-bottom:1px solid #d9e1ed;padding:10px 4px 0}.foodtj-bar-slot{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px}.foodtj-bar{width:min(100%,44px);min-height:2px;border-radius:6px 6px 0 0;background:#ff7626}.foodtj-bar.profit{background:#16a34a}.foodtj-bar-value{font-size:11px;color:#42526b;white-space:nowrap}.foodtj-axis{display:flex;justify-content:space-between;gap:8px;padding:8px 4px 0}.foodtj-axis span{flex:1;text-align:center;font-size:11px;color:var(--muted)}
+/* Телефон ва планшет */
+@media(max-width:850px){
+  .foodtj-sidebar{width:78px;padding:0 8px 12px}
+  .foodtj-side-brand{font-size:0;height:70px}
+  .foodtj-side-brand:before{content:'👨‍🍳';font-size:28px}
+  .foodtj-nav a{justify-content:center;padding:13px 5px}
+  .foodtj-nav a .nav-label{display:none}
+  .top{margin-left:78px;padding:13px 16px}
+  .wrap{margin-left:78px;padding:20px 14px 40px}
+}
+@media(max-width:560px){
+  .foodtj-sidebar{
+    position:sticky;
+    top:0;
+    width:100%;
+    height:auto;
+    display:block;
+    padding:7px;
+  }
+  .foodtj-side-brand{display:none}
+  .foodtj-nav{display:flex;overflow-x:auto;gap:5px}
+  .foodtj-nav a{flex:0 0 auto;padding:10px 12px;font-size:12px}
+  .foodtj-nav a .nav-label{display:inline}
+  .top{margin-left:0;padding:12px 14px}
+  .wrap{margin-left:0;padding:16px 11px 35px}
+  .hero{grid-template-columns:1fr;padding:20px}
+  .hero .emoji{display:none}
+  .formgrid{grid-template-columns:1fr}
+  #foodCatalogSection .toolbar{grid-template-columns:1fr}
+  #foodCatalogGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .admin-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .admin-bar-row{grid-template-columns:85px 1fr 55px}
+  .cartbar{flex-direction:column;align-items:flex-start}
+}
 </style>
 </head>
+
 <body>
+
 <aside class="foodtj-sidebar" aria-label="Менюи асосӣ">
   <div class="foodtj-side-brand">Food<span>TJ</span></div>
   <nav class="foodtj-nav">
@@ -86,132 +565,298 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
     <a href="#foodCatalogSection"><span class="nav-ico">▦</span><span class="nav-label">Каталог</span></a>
     <a href="#myOrdersSection"><span class="nav-ico">▣</span><span class="nav-label">Фармоишҳо</span></a>
     <a href="#walletSection"><span class="nav-ico">◈</span><span class="nav-label">Ҳамён</span></a>
-    <a href="#accountPanel"><span class="nav-ico">♙</span><span class="nav-label">Истифодабарандагон</span></a>
+    <a href="#accountPanel"><span class="nav-ico">♙</span><span class="nav-label">Ҳисоби ман</span></a>
     <a href="#adminSection"><span class="nav-ico">▥</span><span class="nav-label">Таҳлилҳо</span></a>
     <a href="#accountPanel"><span class="nav-ico">⚙</span><span class="nav-label">Танзимотҳо</span></a>
   </nav>
-  <div class="foodtj-side-bottom"><strong>♨ FoodTJ</strong><p>Системаи идоракунии хӯрокҳо</p><p class="copyright">© 2026 FoodTJ. Ҳама ҳуқуқҳо ҳифз шудаанд.</p></div>
+  <div class="foodtj-side-bottom">
+    <strong>♨ FoodTJ</strong>
+    <p>Системаи идоракунии хӯрокҳо</p>
+    <p class="copyright">© 2026 FoodTJ. Ҳама ҳуқуқҳо ҳифз шудаанд.</p>
+  </div>
 </aside>
 
 <header class="top">
-  <div><div class="brand">Food<span>TJ</span></div><small>Хӯрок фармоиш деҳ — ба хонаат расонем</small></div>
+  <div>
+    <div class="brand">Food<span>TJ</span></div>
+    <small>Хӯрок фармоиш деҳ — ба хонаат расонем</small>
+  </div>
   <div class="top-actions">
     <button class="secondary" id="loginTop">Вуруд / Сабти ном</button>
     <button class="secondary hidden" id="accountTop">Ҳисоб</button>
     <button class="secondary hidden" id="logoutTop">Баромадан</button>
   </div>
 </header>
+
 <main class="wrap">
+
   <section class="hero">
-    <div><h1>Хӯроки дӯстдоштаатро фармоиш деҳ.</h1><p>Ресторанро интихоб кун, аз меню хӯрок илова кун ва суроғаи расониданро навис. FoodTJ ҳоло дар марҳилаи санҷиш қарор дорад.</p></div>
+    <div>
+      <h1>Хӯроки дӯстдоштаатро фармоиш деҳ.</h1>
+      <p>Ресторанро интихоб кун, аз меню хӯрок илова кун ва суроғаи расониданро навис. FoodTJ ҳоло дар марҳилаи санҷиш қарор дорад.</p>
+    </div>
     <div class="emoji">🍔 🍕 🥘</div>
   </section>
 
   <div id="notice" class="notice hidden" role="status"></div>
-  <div id="foodtjConnectionStatus" class="muted small" role="status" style="margin:0 0 12px">Пайвастшавӣ санҷида мешавад...</div>
+  <div id="foodtjConnectionStatus" class="muted small" role="status" style="margin:0 0 12px">
+    Пайвастшавӣ санҷида мешавад...
+  </div>
 
+  <!-- Воридшавӣ ва сабти ном -->
   <section id="authPanel" class="card hidden">
-    <div class="section-head"><h2 id="authTitle">Вуруд ба FoodTJ</h2><button class="secondary" id="closeAuth">Пӯшидан</button></div>
+    <div class="section-head">
+      <h2 id="authTitle">Вуруд ба FoodTJ</h2>
+      <button class="secondary" id="closeAuth">Пӯшидан</button>
+    </div>
     <div class="formgrid">
       <input id="authName" class="hidden" placeholder="Ному насаб">
       <input id="authPhone" placeholder="Рақами телефон (ихтиёрӣ)">
       <input id="authEmail" type="email" placeholder="Email" autocomplete="email">
       <input id="authPassword" type="password" placeholder="Парол" autocomplete="current-password">
     </div>
-    <div class="row" style="margin-top:12px"><button id="authSubmit">Вуруд</button><button class="secondary" id="toggleSignup">Сабти номи нав</button></div>
-    <p class="muted small">Барои сабти ном email ва парол лозим аст. Нақш худкор «муштарӣ» мешавад; нақши курьер/ресторанро администратор дар база таъин мекунад.</p>
+    <div class="row" style="margin-top:12px">
+      <button id="authSubmit">Вуруд</button>
+      <button class="secondary" id="toggleSignup">Сабти номи нав</button>
+    </div>
+    <div style="margin-top:12px">
+      <button type="button" class="secondary" id="forgotPasswordBtn">
+        🔑 Паролро фаромӯш кардед?
+      </button>
+    </div>
+    <p class="muted small">
+      Барои сабти ном email ва парол лозим аст. Нақш худкор «муштарӣ» мешавад; нақши курьер/ресторанро администратор дар база таъин мекунад.
+    </p>
   </section>
 
+  <!-- Барқароркунии парол -->
+  <section id="passwordRecoveryPanel" class="card hidden section">
+    <div class="section-head">
+      <h2>🔑 Барқарор кардани парол</h2>
+      <button type="button" class="secondary" id="closePasswordRecovery">Пӯшидан</button>
+    </div>
+    <div id="passwordResetRequest">
+      <p class="muted">Email-и аккаунти худро нависед. Мо пайванди барқароркунии паролро мефиристем.</p>
+      <input id="recoveryEmail" type="email" autocomplete="email" placeholder="Email-и шумо">
+      <button type="button" id="sendRecoveryEmail" style="margin-top:12px">
+        Фиристодани пайванд
+      </button>
+    </div>
+    <div id="passwordResetNew" class="hidden">
+      <p class="muted">Пароли нави худро ворид кунед.</p>
+      <input id="recoveryNewPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Пароли нав (ҳадди ақал 8 аломат)">
+      <input id="recoveryConfirmPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Пароли навро такрор кунед" style="margin-top:10px">
+      <button type="button" id="saveRecoveryPassword" style="margin-top:12px">
+        Нигоҳ доштани пароли нав
+      </button>
+    </div>
+    <div id="passwordRecoveryMessage" class="notice hidden" role="status"></div>
+  </section>
+
+  <!-- Ҳисоби ман -->
   <section id="accountPanel" class="card hidden section">
-    <div class="section-head"><h2>Ҳисоби ман</h2><span id="roleBadge" class="pill">муштарӣ</span></div>
+    <div class="section-head">
+      <h2>Ҳисоби ман</h2>
+      <span id="roleBadge" class="pill">муштарӣ</span>
+    </div>
     <p id="accountDetails" class="muted"></p>
-    <div id="courierAvailability" class="hidden row"><button id="availabilityBtn">Фаъол кардани дастрасӣ</button><span id="availabilityText" class="muted"></span></div>
+
+    <div id="courierAvailability" class="hidden row">
+      <button id="availabilityBtn">Фаъол кардани дастрасӣ</button>
+      <span id="availabilityText" class="muted"></span>
+    </div>
+
+    <div class="card section">
+      <h3>🔐 Амнияти аккаунт</h3>
+      <button type="button" class="secondary" id="accountChangePassword">
+        Иваз кардани парол
+      </button>
+      <p class="muted small">Барои иваз кардани парол ба email-и худ пайванди бехатар мегиред.</p>
+    </div>
+
+    <div class="card section">
+      <h3 class="danger-text">🗑️ Нест кардани аккаунт</h3>
+      <p class="muted">
+        Ин амал метавонад баргардонида нашавад. Пеш аз нест кардани аккаунт бояд фармоишҳо ва ҳисоббаробаркуниҳои шумо санҷида шаванд.
+      </p>
+      <button type="button" class="danger" id="deleteMyAccount">
+        Нест кардани аккаунти ман
+      </button>
+      <p class="muted small">Несткунии воқеӣ баъд аз фаъол шудани функсияи бехатари Supabase дастрас мешавад.</p>
+    </div>
   </section>
 
+  <!-- Ҳамён -->
   <section id="walletSection" class="section hidden">
-    <div class="section-head"><h2>Ҳамёни FoodTJ</h2><button class="secondary" id="walletRefresh">Навсозӣ</button></div>
+    <div class="section-head">
+      <h2>Ҳамёни FoodTJ</h2>
+      <button class="secondary" id="walletRefresh">Навсозӣ</button>
+    </div>
+
     <div class="wallet-card">
-      <div class="wallet-top"><div><div class="wallet-label">Бақияи дастрас</div><div id="walletBalance" class="wallet-balance">0.00 сомонӣ</div></div><div class="wallet-icon">◈</div></div>
+      <div class="wallet-top">
+        <div>
+          <div class="wallet-label">Бақияи дастрас</div>
+          <div id="walletBalance" class="wallet-balance">0.00 сомонӣ</div>
+        </div>
+        <div class="wallet-icon">◈</div>
+      </div>
       <div class="wallet-sub">Ҳамёни шахсии FoodTJ · TJS</div>
     </div>
+
     <div class="card wallet-form">
       <h3>Пур кардани ҳамён</h3>
-      <p class="muted">Ин ҷо аввал дархости пуркунӣ сабт мешавад. Бақия танҳо баъди тасдиқи воқеии маблағ аз ҷониби администратор зиёд мешавад.</p>
+      <p class="muted">
+        Ин ҷо аввал дархости пуркунӣ сабт мешавад. Бақия танҳо баъди тасдиқи воқеии маблағ аз ҷониби администратор зиёд мешавад.
+      </p>
       <div class="formgrid">
-        <div><label for="walletAmount" class="muted">Маблағ (сомонӣ, ҳадди ақал 20)</label><input id="walletAmount" type="number" min="20" max="5000" step="0.01" placeholder="Масалан, 100"></div>
-        <div><label for="walletMethod" class="muted">Усули пардохт</label><select id="walletMethod"><option value="alif">Alif Mobi</option><option value="dushanbe_city">Dushanbe City</option><option value="eskhata">Эсхата Онлайн</option><option value="cash">Нақд ба намояндаи FoodTJ</option></select></div>
+        <div>
+          <label for="walletAmount" class="muted">Маблағ (сомонӣ, ҳадди ақал 20)</label>
+          <input id="walletAmount" type="number" min="20" max="5000" step="0.01" placeholder="Масалан, 100">
+        </div>
+        <div>
+          <label for="walletMethod" class="muted">Усули пардохт</label>
+          <select id="walletMethod">
+            <option value="alif">Alif Mobi</option>
+            <option value="dushanbe_city">Dushanbe City</option>
+            <option value="eskhata">Эсхата Онлайн</option>
+            <option value="cash">Нақд ба намояндаи FoodTJ</option>
+          </select>
+        </div>
       </div>
       <button id="walletTopupRequest" style="margin-top:12px">Дархости пуркунӣ</button>
-      <p class="muted small">Пардохти онлайн ҳоло пайваст нашудааст. Интихоби барнома ҳоло танҳо усули дархостро нишон медиҳад; худ аз худ пул намегузаронад.</p>
+      <p class="muted small">
+        Пардохти онлайн ҳоло пайваст нашудааст. Интихоби барнома танҳо усули дархостро нишон медиҳад.
+      </p>
     </div>
+
     <div class="card wallet-form">
       <h3>Таърихи ҳамён</h3>
-      <div id="walletTransactions"><div class="empty">Барои дидани таърих ворид шавед.</div></div>
+      <div id="walletTransactions">
+        <div class="empty">Барои дидани таърих ворид шавед.</div>
+      </div>
     </div>
+
     <div class="card wallet-form">
       <h3>Дархостҳои пуркунӣ</h3>
-      <div id="walletTopupRequests"><div class="empty">Дархостҳо ҳоло бор нашудаанд.</div></div>
+      <div id="walletTopupRequests">
+        <div class="empty">Дархостҳо ҳоло бор нашудаанд.</div>
+      </div>
     </div>
   </section>
 
+  <!-- Ресторанҳо -->
   <section id="restaurantSection" class="section">
-    <div class="section-head"><h2>Ресторанҳо</h2><span id="restaurantCount" class="muted"></span></div>
-    <div class="toolbar"><input id="searchRestaurants" placeholder="Ҷустуҷӯи ресторан..." aria-label="Ҷустуҷӯи ресторан"><button id="reloadRestaurants" class="secondary">Навсозӣ</button></div>
-    <div id="restaurants" class="grid"><div class="empty">Ресторанҳо бор шуда истодаанд...</div></div>
+    <div class="section-head">
+      <h2>Ресторанҳо</h2>
+      <span id="restaurantCount" class="muted"></span>
+    </div>
+    <div class="toolbar">
+      <input id="searchRestaurants" placeholder="Ҷустуҷӯи ресторан..." aria-label="Ҷустуҷӯи ресторан">
+      <button id="reloadRestaurants" class="secondary">Навсозӣ</button>
+    </div>
+    <div id="restaurants" class="grid">
+      <div class="empty">Ресторанҳо бор шуда истодаанд...</div>
+    </div>
   </section>
 
+  <!-- Каталоги хӯрок -->
   <section id="foodCatalogSection" class="section">
     <div class="section-head">
       <h2>Каталоги хӯрокҳои FoodTJ</h2>
       <button id="reloadFoodCatalog" class="secondary">Навсозӣ</button>
     </div>
-    <p class="muted">Хӯрокҳои дастрас дар каталоги Душанбе. Нархҳое, ки дар база 0 мебошанд, ҳамчун нархи муайяннашуда нишон дода мешаванд.</p>
+    <p class="muted">
+      Хӯрокҳои дастрас дар каталоги Душанбе. Нархҳое, ки дар база 0 мебошанд, ҳамчун нархи муайяннашуда нишон дода мешаванд.
+    </p>
     <div class="toolbar">
       <input id="foodCatalogSearch" placeholder="Ҷустуҷӯи хӯрок...">
-      <select id="foodCatalogCategory"><option value="">Ҳамаи категорияҳо</option></select>
+      <select id="foodCatalogCategory">
+        <option value="">Ҳамаи категорияҳо</option>
+      </select>
     </div>
-    <div id="foodCatalogGrid" class="grid"><div class="empty">Каталог бор шуда истодааст...</div></div>
+    <div id="foodCatalogGrid" class="grid">
+      <div class="empty">Каталог бор шуда истодааст...</div>
+    </div>
   </section>
 
+  <!-- Каталогҳои онлайн -->
   <section id="publicCatalogSection" class="section">
-    <div class="section-head"><h2>Каталогҳои онлайн дар Душанбе</h2><span class="muted">12 манбаи меню</span></div>
-    <p class="muted">Ин каталогҳо барои дидани тарабхона ва намунаи нархҳо ҳастанд. Онҳо ҳоло шарикони тасдиқшудаи FoodTJ нестанд; фармоишро аз менюи расмии худи тарабхона санҷед.</p>
-    <div class="toolbar"><input id="publicCatalogSearch" placeholder="Ҷустуҷӯи тарабхона ё хӯрок..."></div>
+    <div class="section-head">
+      <h2>Каталогҳои онлайн дар Душанбе</h2>
+      <span class="muted">12 манбаи меню</span>
+    </div>
+    <p class="muted">
+      Ин каталогҳо барои дидани тарабхона ва намунаи нархҳо ҳастанд. Онҳо ҳоло шарикони тасдиқшудаи FoodTJ нестанд.
+    </p>
+    <div class="toolbar">
+      <input id="publicCatalogSearch" placeholder="Ҷустуҷӯи тарабхона ё хӯрок...">
+    </div>
     <div id="publicCatalogGrid" class="grid"></div>
   </section>
 
+  <!-- Менюи ресторан -->
   <section id="menuSection" class="section hidden">
-    <div class="section-head"><h2 id="menuTitle">Меню</h2><button class="secondary" id="backRestaurants">← Ресторанҳо</button></div>
+    <div class="section-head">
+      <h2 id="menuTitle">Меню</h2>
+      <button class="secondary" id="backRestaurants">← Ресторанҳо</button>
+    </div>
     <p id="menuDescription" class="muted"></p>
     <div id="menuItems" class="grid"></div>
-    <div id="cartBar" class="cartbar hidden"><div><strong id="cartCount">0 хӯрок</strong><br><small id="cartTotal">Ҷамъ: 0 сомонӣ</small></div><button id="checkoutBtn">Фармоиш додан</button></div>
+    <div id="cartBar" class="cartbar hidden">
+      <div>
+        <strong id="cartCount">0 хӯрок</strong>
+        <small id="cartTotal">Ҷамъ: 0 сомонӣ</small>
+      </div>
+      <button id="checkoutBtn">Фармоиш додан</button>
+    </div>
   </section>
 
+  <!-- Суроғаи расонидан -->
   <section id="checkoutSection" class="card section hidden">
-    <div class="section-head"><h2>Суроғаи расонидан</h2><button class="secondary" id="cancelCheckout">Бекор</button></div>
+    <div class="section-head">
+      <h2>Суроғаи расонидан</h2>
+      <button class="secondary" id="cancelCheckout">Бекор</button>
+    </div>
     <div class="formgrid">
       <input id="deliveryAddress" class="full" placeholder="Суроғаи пурра дар Душанбе" required>
       <input id="deliveryPhone" placeholder="Рақами телефон" required>
-      <select id="paymentMethod"><option value="cash">Пули нақд</option><option value="wallet" disabled>Ҳамёни FoodTJ — ҳоло фаъол нест</option><option value="online" disabled>Пардохти онлайн — ҳоло фаъол нест</option></select>
+      <select id="paymentMethod">
+        <option value="cash">Пули нақд</option>
+        <option value="wallet" disabled>Ҳамёни FoodTJ — ҳоло фаъол нест</option>
+        <option value="online" disabled>Пардохти онлайн — ҳоло фаъол нест</option>
+      </select>
       <textarea id="orderNotes" class="full" placeholder="Шарҳ ба ресторан ё курьер (ихтиёрӣ)"></textarea>
     </div>
-    <p class="muted small">Ҳамёни дохилӣ ва пардохти онлайн то пайваст шудани провайдери пардохт фаъол нестанд. Ҳоло «Пули нақд»-ро интихоб кунед.</p>
+    <p class="muted small">
+      Ҳамёни дохилӣ ва пардохти онлайн то пайваст шудани провайдери пардохт фаъол нестанд.
+    </p>
     <div id="checkoutPriceBreakdown" class="card" style="margin:12px 0"></div>
     <button id="placeOrder">Тасдиқи фармоиш</button>
   </section>
 
+  <!-- Фармоишҳои ман -->
   <section id="myOrdersSection" class="section hidden">
-    <h2>Фармоишҳои ман</h2><div id="myOrders"></div>
+    <h2>Фармоишҳои ман</h2>
+    <div id="myOrders"></div>
   </section>
 
+  <!-- Панели курьер -->
   <section id="courierSection" class="section hidden">
-    <div class="section-head"><h2>Панели курьер</h2><button class="secondary" id="reloadCourier">Навсозӣ</button></div>
-    <p class="muted">Барои дидани фармоишҳои дастрас, профили шумо бояд нақши courier дошта бошад ва дастрасӣ фаъол бошад.</p>
+    <div class="section-head">
+      <h2>Панели курьер</h2>
+      <button class="secondary" id="reloadCourier">Навсозӣ</button>
+    </div>
+    <p class="muted">
+      Барои дидани фармоишҳои дастрас, профили шумо бояд нақши courier дошта бошад ва дастрасӣ фаъол бошад.
+    </p>
     <div id="courierOrders"></div>
   </section>
 
+  <!-- Панели ресторан -->
   <section id="restaurantOwnerSection" class="section hidden">
     <h2>Панели ресторан</h2>
+
     <div class="card">
       <h3>Илова кардани ресторан</h3>
       <div class="formgrid">
@@ -220,1263 +865,882 @@ body.admin-mode .hero,body.admin-mode #restaurantSection,body.admin-mode #public
         <input id="newRestAddress" class="full" placeholder="Суроға">
         <textarea id="newRestDescription" class="full" placeholder="Тавсифи ресторан"></textarea>
       </div>
-      <button id="createRestaurant" style="margin-top:10px">Фиристодан барои тасдиқ</button>
-      <p class="muted small">Ресторан баъд аз тасдиқи администратор ба муштариён намоён мешавад.</p>
+      <button id="createRestaurant" style="margin-top:10px">
+        Фиристодан барои тасдиқ
+      </button>
+      <p class="muted small">
+        Ресторан баъд аз тасдиқи администратор ба муштариён намоён мешавад.
+      </p>
     </div>
+
     <div class="card section">
-      <h3>Ресторанҳои ман</h3><div id="ownerRestaurants"></div>
+      <h3>Ресторанҳои ман</h3>
+      <div id="ownerRestaurants"></div>
     </div>
+
     <div class="card section">
       <h3>Иловаи хӯрок</h3>
       <div class="formgrid">
-        <select id="ownerRestaurantSelect" class="full"><option value="">Аввал ресторанро интихоб кунед</option></select>
+        <select id="ownerRestaurantSelect" class="full">
+          <option value="">Аввал ресторанро интихоб кунед</option>
+        </select>
         <input id="newItemName" placeholder="Номи хӯрок">
         <input id="newItemPrice" type="number" min="0" step="0.01" placeholder="Нарх бо сомонӣ">
         <textarea id="newItemDescription" class="full" placeholder="Тавсифи хӯрок"></textarea>
       </div>
-      <button id="createMenuItem" style="margin-top:10px">Илова кардани хӯрок</button>
+      <button id="createMenuItem" style="margin-top:10px">
+        Илова кардани хӯрок
+      </button>
     </div>
-    <div class="card section"><h3>Фармоишҳои ресторан</h3><div id="restaurantOrders"></div></div>
+
+    <div class="card section">
+      <h3>Фармоишҳои ресторан</h3>
+      <div id="restaurantOrders"></div>
+    </div>
   </section>
 
+  <!-- ===== Панели администратор ===== -->
   <section id="adminSection" class="section hidden">
 
     <div class="admin-header">
       <div>
-        <h2>Панели идоракунии FoodTJ</h2>
-        <div class="admin-subtitle">
-          Маркази идоракунии системаи расонидани хӯрок
-        </div>
+        <h2>⚙️ Панели администратор</h2>
+        <p class="admin-subtitle">
+          Идоракунии FoodTJ — ресторанҳо, фармоишҳо,
+          курьерҳо, муштариён ва молия
+        </p>
       </div>
-      <div class="admin-actions">
-        <button class="admin-refresh" id="reloadAdmin">↻ Навсозӣ</button>
+      <button id="adminRefresh" class="admin-refresh">
+        ↻ Навсозии маълумот
+      </button>
+    </div>
+
+    <!-- Нишондиҳандаҳои асосӣ -->
+    <div class="admin-kpis">
+      <div class="admin-kpi">
+        <div class="kpi-icon">🍽️</div>
+        <div class="kpi-label">Ресторанҳо</div>
+        <div class="kpi-value" id="adminRestaurantCount">0</div>
+      </div>
+
+      <div class="admin-kpi">
+        <div class="kpi-icon">📦</div>
+        <div class="kpi-label">Ҳамаи фармоишҳо</div>
+        <div class="kpi-value" id="adminOrderCount">0</div>
+      </div>
+
+      <div class="admin-kpi">
+        <div class="kpi-icon">🛵</div>
+        <div class="kpi-label">Курьерҳо</div>
+        <div class="kpi-value" id="adminCourierCount">0</div>
+      </div>
+
+      <div class="admin-kpi">
+        <div class="kpi-icon">👥</div>
+        <div class="kpi-label">Истифодабарандагон</div>
+        <div class="kpi-value" id="adminUserCount">0</div>
+      </div>
+
+      <div class="admin-kpi">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-label">Маблағи фармоишҳо</div>
+        <div class="kpi-value" id="adminRevenue">0 сомонӣ</div>
+      </div>
+
+      <div class="admin-kpi">
+        <div class="kpi-icon">📈</div>
+        <div class="kpi-label">Комиссияи ҳисобшуда</div>
+        <div class="kpi-value" id="adminCommission">0 сомонӣ</div>
       </div>
     </div>
 
+    <!-- Тугмаҳои бахшҳои администратор -->
     <div class="admin-tabs" id="adminTabs">
-      <button class="active" data-admin-tab="overview">📊 Dashboard</button>
-      <button data-admin-tab="users">👥 Истифодабарандагон</button>
-      <button data-admin-tab="restaurants">🍽️ Ресторанҳо</button>
-      <button data-admin-tab="couriers">🛵 Курьерҳо</button>
-      <button data-admin-tab="orders">📦 Фармоишҳо</button>
-      <button data-admin-tab="wallet">💳 Ҳамёнҳо</button>
-      <button data-admin-tab="commission">💰 Комиссия</button>
-      <button data-admin-tab="settings">⚙ Танзимот</button>
+      <button type="button" class="active" data-admin-tab="overview">
+        📊 Умумӣ
+      </button>
+      <button type="button" data-admin-tab="orders">
+        📦 Фармоишҳо
+      </button>
+      <button type="button" data-admin-tab="restaurants">
+        🍽️ Ресторанҳо
+      </button>
+      <button type="button" data-admin-tab="couriers">
+        🛵 Курьерҳо
+      </button>
+      <button type="button" data-admin-tab="users">
+        👥 Истифодабарандагон
+      </button>
+      <button type="button" data-admin-tab="finance">
+        💳 Молия
+      </button>
+      <button type="button" data-admin-tab="settings">
+        ⚙️ Танзимот
+      </button>
     </div>
 
-    <div class="admin-panel active" id="adminPanel-overview">
-      <div class="admin-kpis">
-        <div class="admin-kpi">
-          <div class="kpi-icon">📦</div>
-          <div class="kpi-label">Ҳамаи фармоишҳо</div>
-          <div class="kpi-value" id="admOrdersCount">—</div>
-        </div>
-        <div class="admin-kpi">
-          <div class="kpi-icon">🍽️</div>
-          <div class="kpi-label">Ресторанҳо</div>
-          <div class="kpi-value" id="admRestaurantsCount">—</div>
-        </div>
-        <div class="admin-kpi">
-          <div class="kpi-icon">👥</div>
-          <div class="kpi-label">Муштариён</div>
-          <div class="kpi-value" id="admCustomersCount">—</div>
-        </div>
-        <div class="admin-kpi">
-          <div class="kpi-icon">🛵</div>
-          <div class="kpi-label">Курьерҳо</div>
-          <div class="kpi-value" id="admCouriersCount">—</div>
-        </div>
-        <div class="admin-kpi">
-          <div class="kpi-icon">💰</div>
-          <div class="kpi-label">Ҷамъи фармоишҳо</div>
-          <div class="kpi-value" id="admSalesTotal">—</div>
-        </div>
-        <div class="admin-kpi">
-          <div class="kpi-icon">💳</div>
-          <div class="kpi-label">Дархостҳои ҳамён</div>
-          <div class="kpi-value" id="admTopupsCount">—</div>
-        </div>
+    <!-- Умумӣ -->
+    <div class="admin-panel active" id="adminPanelOverview">
+      <div class="admin-panel-title">
+        <h3>📊 Ҳисоботи умумӣ</h3>
       </div>
 
-      <div class="foodtj-analytics" id="foodtjAnalytics">
-        <div class="admin-panel-title"><h3>📈 Ҳисоботи имрӯз ва 7 рӯзи охир</h3><span class="muted">Вақти Душанбе · танҳо фармоишҳои расонидашуда барои комиссия</span></div>
+      <div class="foodtj-analytics">
         <div class="foodtj-analytics-grid">
-          <div class="foodtj-metric"><small>Фармоишҳои имрӯз (ҳама)</small><strong id="ftTodayOrders">—</strong></div>
-          <div class="foodtj-metric"><small>Расонидашуда имрӯз</small><strong id="ftTodayDelivered">—</strong></div>
-          <div class="foodtj-metric"><small>Маблағи фармоишҳои расонидашуда</small><strong id="ftTodaySales">—</strong></div>
-          <div class="foodtj-metric"><small>Комиссияи 8% (сабтшуда)</small><strong id="ftTodayCommission">—</strong></div>
-          <div class="foodtj-metric"><small>Бонуси 2% аз комиссия (тахмин)</small><strong id="ftTodayBonus">—</strong></div>
-          <div class="foodtj-metric"><small>Баъди бонус (на фоидаи холис)</small><strong id="ftTodayNet">—</strong></div>
+          <div class="foodtj-metric">
+            <small>Фармоишҳои имрӯз</small>
+            <strong id="analyticsTodayOrders">0</strong>
+          </div>
+          <div class="foodtj-metric">
+            <small>Фармоишҳои анҷомшуда</small>
+            <strong id="analyticsCompletedOrders">0</strong>
+          </div>
+          <div class="foodtj-metric">
+            <small>Фармоишҳои бекоршуда</small>
+            <strong id="analyticsCancelledOrders">0</strong>
+          </div>
+          <div class="foodtj-metric">
+            <small>Фурӯши имрӯз</small>
+            <strong id="analyticsTodayRevenue">0 сомонӣ</strong>
+          </div>
         </div>
+
         <div class="foodtj-chart-grid">
-          <div class="foodtj-chart"><h4>📦 Фармоишҳо — 7 рӯз</h4><div id="ftOrdersChart"></div></div>
-          <div class="foodtj-chart"><h4>💰 Комиссияи расонидашуда — 7 рӯз</h4><div id="ftProfitChart"></div></div>
+          <div class="foodtj-chart">
+            <h3>Фармоишҳо дар 7 рӯзи охир</h3>
+            <div id="adminOrdersChart" class="foodtj-bars"></div>
+            <div id="adminOrdersChartLabels" class="foodtj-axis"></div>
+          </div>
+
+          <div class="foodtj-chart">
+            <h3>Фурӯш дар 7 рӯзи охир</h3>
+            <div id="adminRevenueChart" class="foodtj-bars"></div>
+            <div id="adminRevenueChartLabels" class="foodtj-axis"></div>
+          </div>
         </div>
-        <p class="muted small" id="ftAnalyticsNote">Ҳисоб аз рӯйи маълумоти дастрас дар Supabase. Хароҷоти дигар ба ҳисоб дохил нашудаанд.</p>
       </div>
+
       <div class="card">
-        <div class="admin-panel-title">
-          <h3>Фармоишҳои охирин</h3>
-          <button class="secondary" data-admin-tab="orders">Ҳамаашро бинед</button>
-        </div>
+        <h3>Фармоишҳои охирин</h3>
         <div id="adminRecentOrders">
-          <div class="empty">Маълумот бор нашудааст.</div>
-        </div>
-      </div>
-
-      <div class="admin-chart">
-        <h3>Ҳолати фармоишҳо</h3>
-        <div id="adminOrderStats">
-          <div class="empty">Омор ҳоло бор нашудааст.</div>
+          <p class="muted">Маълумот бор мешавад...</p>
         </div>
       </div>
     </div>
 
-    <div class="admin-panel" id="adminPanel-users">
+    <!-- Фармоишҳо -->
+    <div class="admin-panel" id="adminPanelOrders">
       <div class="admin-panel-title">
-        <h3>Истифодабарандагон</h3>
-        <span class="muted">Рӯйхати аккаунтҳо</span>
+        <h3>📦 Идоракунии фармоишҳо</h3>
+        <button type="button" class="secondary" id="adminExportOrders">
+          CSV
+        </button>
       </div>
-      <input id="adminUserSearch" placeholder="Ҷустуҷӯ аз рӯйи ном ё телефон...">
-      <div id="adminUsersList" style="margin-top:14px">
-        <div class="empty">Маълумот бор нашудааст.</div>
+
+      <div class="toolbar">
+        <input id="adminOrderSearch"
+          placeholder="Ҷустуҷӯ бо рақами фармоиш ё муштарӣ">
+
+        <select id="adminOrderStatusFilter">
+          <option value="">Ҳамаи ҳолатҳо</option>
+          <option value="pending">Интизорӣ</option>
+          <option value="accepted">Қабулшуда</option>
+          <option value="preparing">Омодашавӣ</option>
+          <option value="ready">Омода</option>
+          <option value="picked_up">Гирифта шуд</option>
+          <option value="delivering">Дар роҳ</option>
+          <option value="delivered">Расонида шуд</option>
+          <option value="cancelled">Бекоршуда</option>
+        </select>
+      </div>
+
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Фармоиш</th>
+              <th>Муштарӣ</th>
+              <th>Ресторан</th>
+              <th>Маблағ</th>
+              <th>Ҳолат</th>
+              <th>Сана</th>
+              <th>Амал</th>
+            </tr>
+          </thead>
+          <tbody id="adminOrdersTable">
+            <tr><td colspan="7">Бор мешавад...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <div class="admin-panel" id="adminPanel-restaurants">
+    <!-- Ресторанҳо -->
+    <div class="admin-panel" id="adminPanelRestaurants">
       <div class="admin-panel-title">
-        <h3>Идоракунии ресторанҳо</h3>
+        <h3>🍽️ Идоракунии ресторанҳо</h3>
       </div>
-      <input id="adminRestaurantSearch" placeholder="Ҷустуҷӯи ресторан...">
-      <div id="adminRestaurantsList" style="margin-top:14px">
-        <div class="empty">Маълумот бор нашудааст.</div>
+
+      <div class="toolbar">
+        <input id="adminRestaurantSearch"
+          placeholder="Ҷустуҷӯи ресторан">
+        <select id="adminRestaurantFilter">
+          <option value="">Ҳама</option>
+          <option value="pending">Интизори тасдиқ</option>
+          <option value="approved">Тасдиқшуда</option>
+          <option value="rejected">Радшуда</option>
+        </select>
+      </div>
+
+      <div id="adminRestaurantsList">
+        <div class="empty">Маълумот бор мешавад...</div>
       </div>
     </div>
 
-    <div class="admin-panel" id="adminPanel-couriers">
+    <!-- Курьерҳо -->
+    <div class="admin-panel" id="adminPanelCouriers">
       <div class="admin-panel-title">
-        <h3>Идоракунии курьерҳо</h3>
+        <h3>🛵 Идоракунии курьерҳо</h3>
       </div>
-      <input id="adminCourierSearch" placeholder="Ҷустуҷӯи курьер...">
-      <div id="adminCouriersList" style="margin-top:14px">
-        <div class="empty">Маълумот бор нашудааст.</div>
+
+      <div class="card">
+        <h3>Курьерҳои сабтшуда</h3>
+        <p class="muted">
+          Барои таъини нақш ва тасдиқи курьер,
+          иҷозатҳои дурусти Supabase заруранд.
+        </p>
+        <div id="adminCouriersList">
+          <div class="empty">Курьерҳо бор мешаванд...</div>
+        </div>
       </div>
     </div>
 
-    <div class="admin-panel" id="adminPanel-orders">
+    <!-- Истифодабарандагон -->
+    <div class="admin-panel" id="adminPanelUsers">
       <div class="admin-panel-title">
-        <h3>Ҳамаи фармоишҳо</h3>
+        <h3>👥 Истифодабарандагон</h3>
       </div>
-      <div id="adminOrders">
-        <div class="empty">Маълумот бор нашудааст.</div>
+
+      <div class="toolbar">
+        <input id="adminUserSearch"
+          placeholder="Ҷустуҷӯи истифодабаранда">
+        <select id="adminUserRoleFilter">
+          <option value="">Ҳамаи нақшҳо</option>
+          <option value="customer">Муштарӣ</option>
+          <option value="courier">Курьер</option>
+          <option value="restaurant">Ресторан</option>
+          <option value="admin">Администратор</option>
+        </select>
+      </div>
+
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Ном</th>
+              <th>Email</th>
+              <th>Нақш</th>
+              <th>Ҳолат</th>
+              <th>Санаи сабт</th>
+            </tr>
+          </thead>
+          <tbody id="adminUsersTable">
+            <tr><td colspan="5">Бор мешавад...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <div class="admin-panel" id="adminPanel-wallet">
+    <!-- Молия -->
+    <div class="admin-panel" id="adminPanelFinance">
       <div class="admin-panel-title">
-        <h3>Дархостҳои пур кардани ҳамён</h3>
+        <h3>💳 Молия ва ҳамёнҳо</h3>
       </div>
-      <div class="admin-info">
-        Дар ин версия дархостҳо танҳо намоиш дода мешаванд.
-        Тасдиқи маблағ бояд тавассути RPC-и бехатари администратор иҷро шавад.
-      </div>
-      <div id="adminWalletRequests">
-        <div class="empty">Маълумот бор нашудааст.</div>
-      </div>
-    </div>
 
-    <div class="admin-panel" id="adminPanel-commission">
-      <div class="admin-panel-title">
-        <h3>Ҳисоботи комиссия</h3>
-      </div>
       <div class="admin-kpis">
         <div class="admin-kpi">
-          <div class="kpi-label">Комиссияи сабтшуда</div>
-          <div class="kpi-value" id="admCommissionTotal">—</div>
+          <div class="kpi-label">Фурӯши анҷомшуда</div>
+          <div class="kpi-value" id="financeTotalSales">0 сомонӣ</div>
         </div>
         <div class="admin-kpi">
-          <div class="kpi-label">Меъёри хизматрасонӣ</div>
-          <div class="kpi-value">8%</div>
+          <div class="kpi-label">Комиссияи платформа</div>
+          <div class="kpi-value" id="financePlatformFee">0 сомонӣ</div>
         </div>
         <div class="admin-kpi">
-          <div class="kpi-label">Бонуси курьер</div>
-          <div class="kpi-value">2%</div>
+          <div class="kpi-label">Пардохтҳои интизорӣ</div>
+          <div class="kpi-value" id="financePendingTopups">0</div>
         </div>
       </div>
-      <div class="admin-info">
-        Ҳисоби комиссия аз рӯйи service_fee-и фармоишҳои база нишон дода мешавад.
-        Ин маблағ ҳанӯз маънои даромади воқеан гирифташударо надорад.
-        Қоидаи дақиқи бонуси курьерро пеш аз ҳисоббаробаркунӣ муайян мекунем.
+
+      <div class="card">
+        <h3>Дархостҳои пур кардани ҳамён</h3>
+        <div id="adminWalletRequests">
+          <div class="empty">Маълумот бор мешавад...</div>
+        </div>
+      </div>
+
+      <div class="card section">
+        <h3>Таърихи амалиётҳои молиявӣ</h3>
+        <div id="adminFinanceTransactions">
+          <div class="empty">Маълумот бор мешавад...</div>
+        </div>
       </div>
     </div>
 
-    <div class="admin-panel" id="adminPanel-settings">
+    <!-- Танзимот -->
+    <div class="admin-panel" id="adminPanelSettings">
       <div class="admin-panel-title">
-        <h3>Танзимоти FoodTJ</h3>
+        <h3>⚙️ Танзимоти FoodTJ</h3>
       </div>
+
       <div class="card">
-        <p><strong>Комиссияи хизматрасонӣ:</strong> 8%</p>
-        <p><strong>Бонуси курьер:</strong> 2% (қоидаи ҳисоб бояд тасдиқ шавад)</p>
-        <p><strong>Ҳаққи расонидан:</strong> 10 сомонӣ</p>
-        <p><strong>Шаҳри аввал:</strong> Душанбе</p>
+        <h3>Маълумоти платформа</h3>
+        <div class="formgrid">
+          <div>
+            <label for="settingsCommission" class="muted">
+              Комиссияи платформа (%)
+            </label>
+            <input id="settingsCommission" type="number"
+              min="0" max="100" step="0.1" value="8">
+          </div>
+          <div>
+            <label for="settingsDeliveryFee" class="muted">
+              Нархи асосии расонидан (сомонӣ)
+            </label>
+            <input id="settingsDeliveryFee" type="number"
+              min="0" step="0.01" value="10">
+          </div>
+        </div>
+
         <p class="muted small">
-          Инҳо танҳо маълумоти нишондиҳандаанд. Тағйир додани танзимот
-          баъд аз омода шудани механизми бехатари серверӣ илова мешавад.
+          Ин арзишҳо то пайваст шудани танзимоти серверӣ
+          танҳо дар форма намоиш дода мешаванд.
+        </p>
+
+        <button type="button" id="saveAdminSettings" disabled>
+          Нигоҳ доштани танзимот (ҳоло ғайрифаъол)
+        </button>
+      </div>
+
+      <div class="card section">
+        <h3>Амнияти система</h3>
+        <p class="muted">
+          Иҷозатҳои администратор бояд дар Supabase
+          бо RLS ва функсияҳои бехатари серверӣ санҷида шаванд.
+        </p>
+        <p class="muted">
+          Калиди service_role набояд дар index.html ҷойгир карда шавад.
         </p>
       </div>
     </div>
 
   </section>
 
-  <div class="footer">FoodTJ • Версияи аввал • Душанбе, Тоҷикистон</div>
+  <footer class="footer">
+    © 2026 FoodTJ — Душанбе, Тоҷикистон.
+    <p>Платформаи фармоиш ва расонидани хӯрок.</p>
+  </footer>
+
 </main>
 
+<!-- JavaScript дар қисми 4 илова мешавад -->
+
 <script>
-/* ============================================================
-   FoodTJ — версияи ниҳоӣ (пурра ислоҳшуда)
-   ============================================================ */
+'use strict';
 
-const SUPABASE_URL = 'https://rgminzzmlktkliliiupt.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_UHJzsYIpimmjtDtHEnacQA_BJVKE2pD';
+/* ===== FoodTJ: Supabase ===== */
+const SUPABASE_URL =
+  'https://rgminzzmlktkliliiupt.supabase.co';
 
-const $ = (id) => document.getElementById(id);
-const money = (n) => `${Number(n || 0).toLocaleString('tg-TJ',{minimumFractionDigits:2,maximumFractionDigits:2})} сомонӣ`;
-const statusNames = {new:'Нав',accepted:'Қабул шуд',preparing:'Пухта шуда истодааст',ready_for_pickup:'Интизорӣ барои курьер',picked_up:'Курьер гирифт',delivering:'Дар роҳ',delivered:'Расонида шуд',cancelled:'Бекор шуд'};
-let sb = null, currentUser = null, profile = null, authMode = 'login';
-let restaurants = [], currentRestaurant = null, menuItems = [], cart = new Map(), ownerRestaurants = [];
-let foodCatalogItems = [];
+const SUPABASE_KEY =
+  'sb_publishable_UHJzsYIpimmjtDtHEnacQA_BJVKE2pD';
 
-/* ---------- Каталоги онлайн ---------- */
-const publicCatalog = [
- {name:'Merve',kind:'Туркӣ ва байналмилалӣ',url:'https://www.merve.tj/menu',items:[['Гамбургер',32],['Бургери мурғӣ',27],['Шӯрбои мурғӣ',26],['Картошка бирён',23],['Сезар',36],['Пиде бо қима',49]]},
- {name:'Anzur',kind:'Миллӣ ва аврупоӣ',url:'https://www.anzur.tj/menu_en',items:[['Манту (1 дона)',16],['Самбӯса',19],['Лагмони шӯрбо',45],['Питса Маргарита',79],['Оши палав бо гӯшти гов',55],['Шӯрбои шурпа',60]]},
- {name:'Choykhonai Muliyon',kind:'Ошхона',url:'https://www.sufra.tj/v/muliyon/',items:[]},
- {name:'Nomi',kind:'Тарабхона',url:'https://www.sufra.tj/en/v/nomi-dushanbe/',items:[]},
- {name:'Star Food',kind:'Фастфуд',url:'https://www.sufra.tj/ru/v/star-food/',items:[]},
- {name:'FLAVOR',kind:'Тарабхона',url:'https://www.sufra.tj/ru/v/flavor/',items:[]},
- {name:'Deha',kind:'Тарабхона',url:'https://www.sufra.tj/ru/v/deha-dushanbe/',items:[]},
- {name:'Restaurant Forel',kind:'Моҳӣ ва хӯрок',url:'https://www.sufra.tj/ru/v/restoran-forel/',items:[]},
- {name:'Bonu',kind:'Тарабхона',url:'https://www.sufra.tj/ru/v/bonu/',items:[]},
- {name:'Community Gastro-Bar',kind:'Gastro-bar',url:'https://www.sufra.tj/ru/v/community-gastro-bar/',items:[]},
- {name:'Lazzat Saroy',kind:'Тарабхона',url:'https://www.sufra.tj/en/v/lazzat-saroy/',items:[]},
- {name:'Каталоги Taom',kind:'Ҷустуҷӯи тарабхонаҳо',url:'https://taom.aliftech.tj/en/restaurants',items:[]}
-];
+const FOODTJ_URL =
+  'https://zikriollohismonov18-sketch.github.io/FoodTJ/';
 
-function renderPublicCatalog(){
-  const root = $('publicCatalogGrid');
-  if(!root) return;
-  const q = ($('publicCatalogSearch')?.value || '').trim().toLowerCase();
-  const rows = publicCatalog.filter(r =>
-    (r.name + ' ' + r.kind + ' ' + r.items.map(i => i[0]).join(' ')).toLowerCase().includes(q)
-  );
-  if(!rows.length){
-    root.innerHTML = '<div class="empty">Натиҷа ёфт нашуд.</div>';
-    return;
-  }
-  root.innerHTML = rows.map(r => `
-    <article class="card">
-      <div style="font-size:30px">🍽️</div>
-      <h3>${esc(r.name)}</h3>
-      <p class="muted">${esc(r.kind)}</p>
-      ${r.items.length
-        ? `<div>${r.items.map(i => `<div class="item"><span>${esc(i[0])}</span><span class="price">${money(i[1])}</span></div>`).join('')}</div>`
-        : '<p class="muted">Меню ва нархҳои ҷорӣ дар сомонаи тарабхона бинед.</p>'}
-      <a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">Кушодани меню / сомона ↗</a>
-    </article>
-  `).join('');
+const sb = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+let currentUser = null;
+let profile = null;
+let authMode = 'login';
+let passwordRecoveryActive = false;
+
+const $ = id => document.getElementById(id);
+
+function show(id) {
+  const element = $(id);
+  if (element) element.classList.remove('hidden');
 }
 
-/* ============================================================
-   КАТАЛОГИ ХӮРОКҲОИ FoodTJ
-   ============================================================ */
+function hide(id) {
+  const element = $(id);
+  if (element) element.classList.add('hidden');
+}
 
-async function loadFoodCatalog() {
-  const grid = $('foodCatalogGrid');
-  if (!sb || !grid) return;
+function setText(id, value) {
+  const element = $(id);
+  if (element) element.textContent = String(value ?? '');
+}
 
-  grid.innerHTML = '<div class="empty">Каталог бор шуда истодааст...</div>';
+function notify(message, error = false) {
+  const box = $('notice');
+  if (!box) return;
+
+  box.textContent = message;
+  box.classList.remove('hidden', 'error', 'success');
+  box.classList.add(error ? 'error' : 'success');
+}
+
+function recoveryMessage(message, error = false) {
+  const box = $('passwordRecoveryMessage');
+  if (!box) return;
+
+  box.textContent = message;
+  box.classList.remove('hidden', 'error', 'success');
+  box.classList.add(error ? 'error' : 'success');
+}
+
+/* ===== Воридшавӣ ===== */
+function openAuth(mode = 'login') {
+  authMode = mode;
+  show('authPanel');
+  hide('passwordRecoveryPanel');
+
+  const signup = mode === 'signup';
+
+  setText('authTitle', signup
+    ? 'Сабти ном дар FoodTJ'
+    : 'Вуруд ба FoodTJ');
+
+  setText('authSubmit', signup
+    ? 'Сабти ном'
+    : 'Вуруд');
+
+  setText('toggleSignup', signup
+    ? 'Аллакай аккаунт дорам'
+    : 'Сабти номи нав');
+
+  if (signup) show('authName');
+  else hide('authName');
+
+  $('authPanel')?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+}
+
+async function submitAuth() {
+  const email = $('authEmail').value.trim();
+  const password = $('authPassword').value;
+
+  if (!email || !password) {
+    notify('Email ва паролро нависед.', true);
+    return;
+  }
+
+  const button = $('authSubmit');
+  button.disabled = true;
+
+  try {
+    if (authMode === 'signup') {
+      const name = $('authName').value.trim();
+      const phone = $('authPhone').value.trim();
+
+      const { error } = await sb.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: FOODTJ_URL,
+          data: {
+            full_name: name,
+            phone
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      notify(
+        'Сабти ном қабул шуд. Агар тасдиқи email фаъол бошад, почтаи худро санҷед.'
+      );
+    } else {
+      const { error } =
+        await sb.auth.signInWithPassword({
+          email,
+          password
+        });
+
+      if (error) throw error;
+
+      notify('Ба FoodTJ хуш омадед!');
+      hide('authPanel');
+    }
+  } catch (error) {
+    notify(error.message, true);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+/* ===== Профил ===== */
+async function loadProfile() {
+  if (!currentUser) {
+    profile = null;
+    return;
+  }
 
   const { data, error } = await sb
-    .from('foodtj_catalog_items')
-    .select('id,name,category,description,price,city,image_url,is_active')
-    .eq('city', 'Dushanbe')
-    .eq('is_active', true)
-    .order('category')
-    .order('name');
+    .from('profiles')
+    .select('*')
+    .eq('id', currentUser.id)
+    .maybeSingle();
 
   if (error) {
-    grid.innerHTML =
-      '<div class="empty">Хатои боркунии каталог: ' +
-      esc(error.message) + '</div>';
+    console.error('Profile error:', error.message);
+    profile = null;
     return;
   }
 
-  foodCatalogItems = data || [];
-
-  const categorySelect = $('foodCatalogCategory');
-  const previousCategory = categorySelect.value;
-  const categories = [...new Set(
-    foodCatalogItems
-      .map(item => item.category)
-      .filter(Boolean)
-  )].sort();
-
-  categorySelect.innerHTML =
-    '<option value="">Ҳамаи категорияҳо</option>' +
-    categories.map(category =>
-      `<option value="${esc(category)}">${esc(category)}</option>`
-    ).join('');
-
-  if (categories.includes(previousCategory)) {
-    categorySelect.value = previousCategory;
-  }
-
-  renderFoodCatalog();
+  profile = data;
 }
 
-function renderFoodCatalog() {
-  const grid = $('foodCatalogGrid');
-  if (!grid) return;
-
-  const query = ($('foodCatalogSearch').value || '')
-    .trim()
-    .toLowerCase();
-
-  const category = $('foodCatalogCategory').value;
-
-  const filtered = foodCatalogItems.filter(item => {
-    const text = [
-      item.name,
-      item.category,
-      item.description
-    ].join(' ').toLowerCase();
-
-    return text.includes(query) &&
-      (!category || item.category === category);
-  });
-
-  if (!filtered.length) {
-    grid.innerHTML =
-      '<div class="empty">Хӯрок ёфт нашуд.</div>';
+function updateAccountUI() {
+  if (!currentUser) {
+    show('loginTop');
+    hide('accountTop');
+    hide('logoutTop');
+    hide('accountPanel');
+    hide('adminSection');
+    hide('courierSection');
+    hide('restaurantOwnerSection');
+    hide('walletSection');
+    hide('myOrdersSection');
     return;
   }
 
-  grid.innerHTML = filtered.map(item => `
-    <article class="card">
-      ${
-        item.image_url
-          ? `<img src="${esc(item.image_url)}"
-              alt="${esc(item.name)}"
-              loading="lazy"
-              style="width:100%;height:160px;object-fit:cover;border-radius:10px">`
-          : `<div class="food-photo">${foodEmoji(item.name, item.category)}</div>`
-      }
+  hide('loginTop');
+  show('accountTop');
+  show('logoutTop');
+  show('accountPanel');
+  show('walletSection');
+  show('myOrdersSection');
 
-      <h3>${esc(item.name)}</h3>
-      <span class="pill gray">${esc(item.category || 'Хӯрок')}</span>
+  const role = profile?.role || 'customer';
 
-      <p class="muted">${esc(item.description || '')}</p>
-
-      <p class="price">
-        ${
-          Number(item.price) > 0
-            ? money(item.price)
-            : 'Нарх ҳоло муайян нашудааст'
-        }
-      </p>
-
-      <p class="muted small">
-        Барои фармоиш аз менюи ресторани тасдиқшуда истифода баред.
-      </p>
-    </article>
-  `).join('');
-}
-
-/* ============================================================
-   Кӯмакчиҳо
-   ============================================================ */
-function showNotice(message, type='info') {
-  const n = $('notice'); if(!n){alert(message);return;}
-  n.textContent = message;
-  n.className = 'notice' + (type==='error'?' error':type==='success'?' success':'');
-  n.classList.remove('hidden');
-  n.scrollIntoView({behavior:'smooth',block:'nearest'});
-}
-function clearNotice(){ $('notice')?.classList.add('hidden'); }
-function setBusy(button, busy, text) {
-  if(!button) return;
-  if(!button.dataset.original) button.dataset.original = button.textContent;
-  button.disabled = busy;
-  button.textContent = busy ? (text || 'Лутфан интизор шавед...') : button.dataset.original;
-}
-function foodEmoji(name, category){ const s = String(name || '') + ' ' + String(category || ''); if(/бургер/i.test(s)) return '🍔'; if(/фри|картошка/i.test(s)) return '🍟'; if(/кабоб|сихкабоб/i.test(s)) return '🍢'; if(/лагмон|лағмон|шӯрбо/i.test(s)) return '🍜'; if(/манту/i.test(s)) return '🥟'; if(/самбӯса/i.test(s)) return '🥮'; if(/оши палав/i.test(s)) return '🍛'; if(/пицца|питса/i.test(s)) return '🍕'; if(/салат/i.test(s)) return '🥗'; if(/шарбат|нӯшоки/i.test(s)) return '🧃'; return '🍽️'; }
-function moneyNumber(n){ return Math.round((Number(n)+Number.EPSILON)*100)/100; }
-function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function validConfig(){ return SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('PASTE_') && SUPABASE_KEY && !SUPABASE_KEY.includes('PASTE_'); }
-function toggle(id, yes){ const e = $(id); if(e) e.classList.toggle('hidden', !yes); }
-function roleLabel(role){ return ({customer:'Муштарӣ',restaurant:'Ресторан',courier:'Курьер',admin:'Администратор'})[role] || 'Муштарӣ'; }
-function requireLogin(){ if(!currentUser){ toggle('authPanel',true); $('authPanel')?.scrollIntoView({behavior:'smooth'}); showNotice('Барои ин амал аввал ворид шавед.'); return false; } return true; }
-
-/* ---------- Инициализатсия ---------- */
-async function init(){
-  renderPublicCatalog();
-  if(!validConfig()){
-    $('foodtjConnectionStatus').textContent = 'Supabase: URL ё key нодуруст';
-    $('restaurants').innerHTML = '<div class="empty">URL ё publishable key-и Supabase нодуруст аст. Танзимоти index.html-ро санҷед.</div>';
-    $('foodCatalogGrid').innerHTML = '<div class="empty">Каталог: пайвастшавӣ ба Supabase танзим нашудааст.</div>';
-    return;
-  }
-  try {
-    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-      throw new Error('Китобхонаи Supabase бор нашуд. Интернет ё CDN-ро санҷед.');
-    }
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    $('foodtjConnectionStatus').textContent = 'Supabase: китобхона бор шуд · пайвастшавӣ санҷида мешавад';
-    const { data:{session}, error } = await sb.auth.getSession();
-    if(error) showNotice(error.message,'error');
-    $('foodtjConnectionStatus').textContent = 'Supabase: пайваст шуд · ' + (session ? 'корбар ворид шудааст' : 'барои воридшавӣ омода');
-    if(session) await loadProfile(session.user);
-
-    renderPublicCatalog();
-    const tasks = await Promise.allSettled([loadRestaurants(), loadFoodCatalog()]);
-    for (const result of tasks) {
-      if (result.status === 'rejected') console.error('FoodTJ load:', result.reason);
-    }
-
-    sb.auth.onAuthStateChange((_event, session) => {
-      setTimeout(async () => {
-        if(session) await loadProfile(session.user);
-        else resetSession();
-      }, 0);
-    });
-  } catch(e) {
-    console.error('init error:', e);
-    $('foodtjConnectionStatus').textContent = 'Supabase: хато — ' + String(e.message || e);
-    $('restaurants').innerHTML = '<div class="empty">Хатои инициализатсия: ' + esc(e.message || e) + '</div>';
-    $('foodCatalogGrid').innerHTML = '<div class="empty">Пайвастшавӣ иҷро нашуд. Хатои болоро бинед.</div>';
-  }
-}
-function resetSession(){
-  currentUser = null; profile = null;
-  document.body.classList.remove('admin-mode');
-  toggle('accountTop', false); toggle('logoutTop', false); toggle('loginTop', true);
-  ['accountPanel','walletSection','myOrdersSection','courierSection','restaurantOwnerSection','adminSection'].forEach(id => toggle(id, false));
-}
-
-/* ---------- Ҳамёни FoodTJ ---------- */
-function walletMoney(value){ return Number(value || 0).toLocaleString('tg-TJ',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' сомонӣ'; }
-function walletMethodLabel(value){
-  return ({alif:'Alif Mobi',dushanbe_city:'Dushanbe City',eskhata:'Эсхата Онлайн',cash:'Нақд ба намояндаи FoodTJ'})[value] || value || '—';
-}
-async function loadWallet(){
-  if(!currentUser || !sb){
-    $('walletBalance').textContent = '0.00 сомонӣ';
-    $('walletTransactions').innerHTML = '<div class="empty">Барои дидани ҳамён аввал ворид шавед.</div>';
-    $('walletTopupRequests').innerHTML = '<div class="empty">Барои дидани дархостҳо аввал ворид шавед.</div>';
-    return;
-  }
-  $('walletBalance').textContent = 'Бор шуда истодааст...';
-  let {data:account,error:accountError} = await sb.from('foodtj_wallet_accounts').select('balance,currency').eq('user_id',currentUser.id).maybeSingle();
-  if(accountError){
-    $('walletBalance').textContent = '—';
-    $('walletTransactions').innerHTML = '<div class="empty">Ҳамён ҳоло фаъол нест. SQL-и ҳамёнро дар Supabase иҷро кунед.</div>';
-    $('walletTopupRequests').innerHTML = '<div class="empty">Ҳамён ҳоло фаъол нест. SQL-и ҳамёнро дар Supabase иҷро кунед.</div>';
-    console.warn('FoodTJ wallet tables unavailable.', accountError);
-    return;
-  }
-  if(!account){
-    const {error:insErr} = await sb.from('foodtj_wallet_accounts').insert({
-      user_id: currentUser.id, balance: 0, currency: 'TJS'
-    });
-    if(insErr && insErr.code !== '23505'){
-      $('walletBalance').textContent = '—';
-      showNotice('Ҳамён сохта нашуд: ' + insErr.message, 'error');
-      return;
-    }
-    const {data:createdAccount} = await sb.from('foodtj_wallet_accounts').select('balance,currency').eq('user_id',currentUser.id).maybeSingle();
-    if(!createdAccount){
-      $('walletBalance').textContent = '—';
-      showNotice('Ҳамён сохта шуданаш тасдиқ нашуд. Саҳифаро нав кунед.', 'error');
-      return;
-    }
-    account = createdAccount;
-  }
-  $('walletBalance').textContent = walletMoney(account?.balance || 0);
-  const {data:tx,error:txError} = await sb.from('foodtj_wallet_transactions').select('id,transaction_type,amount,status,description,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(20);
-  $('walletTransactions').innerHTML = txError ? '<div class="empty">Таърих бор нашуд.</div>' : (tx||[]).length ? tx.map(t=>`<div class="wallet-entry"><div><strong>${esc(t.description || (t.transaction_type==='topup'?'Пуркунӣ':'Амалиёт'))}</strong><div class="muted small">${esc(t.status)} · ${new Date(t.created_at).toLocaleString('tg-TJ')}</div></div><strong>${t.transaction_type==='topup'?'+':'−'}${walletMoney(t.amount)}</strong></div>`).join('') : '<div class="empty">Ҳоло амалиёт нест.</div>';
-  const {data:req,error:reqError} = await sb.from('foodtj_wallet_topup_requests').select('id,amount,method,status,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(10);
-  $('walletTopupRequests').innerHTML = reqError ? '<div class="empty">Дархостҳо бор нашуданд.</div>' : (req||[]).length ? req.map(r=>`<div class="wallet-entry"><div><strong>${walletMoney(r.amount)} · ${esc(walletMethodLabel(r.method))}</strong><div class="muted small">${new Date(r.created_at).toLocaleString('tg-TJ')}</div></div><span class="pill ${r.status==='approved'?'':'gray'}">${esc(({pending:'Дар интизорӣ',approved:'Тасдиқ шуд',rejected:'Рад шуд'})[r.status]||r.status)}</span></div>`).join('') : '<div class="empty">Ҳоло дархости пуркунӣ нест.</div>';
-}
-async function requestWalletTopup(){
-  if(!requireLogin()) return;
-  const amount=Number($('walletAmount').value);
-  if(!Number.isFinite(amount) || amount<20 || amount>5000){ showNotice('Маблағ бояд аз 20 то 5000 сомонӣ бошад.','error'); return; }
-  const btn=$('walletTopupRequest'); setBusy(btn,true,'Дархост фиристода мешавад...');
-  try{
-    const {error}=await sb.from('foodtj_wallet_topup_requests').insert({user_id:currentUser.id,amount:moneyNumber(amount),method:$('walletMethod').value});
-    if(error) throw error;
-    $('walletAmount').value='';
-    showNotice('Дархости пуркунӣ сабт шуд. Бақия танҳо баъди тасдиқи администратор зиёд мешавад.','success');
-    await loadWallet();
-  }catch(e){showNotice('Дархост сабт нашуд: '+(e.message||e),'error');}
-  finally{setBusy(btn,false);}
-}
-
-/* ---------- Профил ---------- */
-async function loadProfile(user){
-  currentUser = user;
-  let { data:p, error } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
-  if(error){ showNotice('Хатои хондани профил: ' + error.message, 'error'); return; }
-  if(!p){
-    const meta = user.user_metadata || {};
-    const phoneVal = ($('authPhone')?.value || '').trim() || meta.phone || '';
-    const nameVal = ($('authName')?.value || '').trim() || meta.full_name || '';
-    const { data:newP, error:insertError } = await sb.from('profiles').insert({
-      id: user.id, phone: phoneVal, full_name: nameVal, role: 'customer'
-    }).select('*').single();
-    if(insertError){
-      showNotice('Профил сохта нашуд: ' + insertError.message + '. Санҷед, ки сиёсати INSERT барои profiles фаъол аст.', 'error');
-      return;
-    }
-    p = newP;
-  }
-  profile = p;
-  const role = p.role || 'customer';
-  document.body.classList.toggle('admin-mode', role === 'admin');
-  toggle('loginTop', false); toggle('accountTop', true); toggle('logoutTop', true); toggle('accountPanel', true);
-  $('roleBadge').textContent = roleLabel(role);
-  $('accountDetails').textContent = (p.full_name || user.email || 'Истифодабаранда') + ' • ' + (user.email || '') + (p.phone ? ' • ' + p.phone : '');
-  if($('deliveryPhone')) $('deliveryPhone').value = p.phone || '';
-  toggle('courierAvailability', role === 'courier');
-  $('availabilityText').textContent = p.is_available ? 'Дастрас ҳастед' : 'Ҳоло дастрас нестед';
-  $('availabilityBtn').textContent = p.is_available ? 'Хомӯш кардани дастрасӣ' : 'Фаъол кардани дастрасӣ';
-  toggle('myOrdersSection', role === 'customer' || role === 'admin');
-  toggle('courierSection', role === 'courier');
-  toggle('restaurantOwnerSection', role === 'restaurant');
-  toggle('adminSection', role === 'admin');
-  try {
-    await loadWallet();
-  } catch (walletErr) {
-    console.warn('Wallet error (non-critical):', walletErr);
-    if ($('walletBalance')) $('walletBalance').textContent = '—';
-    if ($('walletTransactions')) $('walletTransactions').innerHTML = '<div class="empty">Ҳамён ҳоло дастрас нест.</div>';
-    if ($('walletTopupRequests')) $('walletTopupRequests').innerHTML = '<div class="empty">Ҳамён ҳоло дастрас нест.</div>';
-  }
-  if(role === 'customer' || role === 'admin') await loadMyOrders();
-  if(role === 'courier') await loadCourierOrders();
-  if(role === 'restaurant') await loadOwnerPanel();
-  if(role === 'admin') await loadAdminOrders();
-}
-
-/* ---------- Ресторанҳо ---------- */
-async function loadRestaurants(){
-  if(!sb) return;
-  const { data, error } = await sb.from('restaurants').select('id,name,description,address,phone,image_url,is_open,is_approved').eq('is_approved', true).order('name');
-  if(error){ $('restaurants').innerHTML = '<div class="empty">Ресторанҳо бор нашуданд. ' + esc(error.message) + '</div>'; return; }
-  restaurants = data || [];
-  renderRestaurants();
-}
-function renderRestaurants(){
-  const q = ($('searchRestaurants')?.value || '').trim().toLowerCase();
-  const list = restaurants.filter(r => ((r.name || '') + ' ' + (r.address || '') + ' ' + (r.description || '')).toLowerCase().includes(q));
-  $('restaurantCount').textContent = `${list.length} ресторан`;
-  if(!list.length){ $('restaurants').innerHTML = '<div class="empty">Ҳоло ресторан нест ё натиҷа ёфт нашуд.</div>'; return; }
-  $('restaurants').innerHTML = list.map(r => `
-    <article class="card">
-      ${r.image_url
-        ? `<img src="${esc(r.image_url)}" alt="${esc(r.name)}" style="width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:8px">`
-        : '<div style="font-size:36px;margin-bottom:8px">🍽️</div>'}
-      <h3>${esc(r.name)}</h3>
-      <p class="muted">${esc(r.description || '')}</p>
-      <p class="muted">📍 ${esc(r.address || 'Душанбе')}</p>
-      <span class="pill ${r.is_open ? '' : 'gray'}">${r.is_open ? 'Кушода' : 'Ҳоло баста'}</span>
-      <div style="margin-top:13px"><button data-open-restaurant="${r.id}" ${r.is_open ? '' : 'disabled'}>Дидани меню</button></div>
-    </article>
-  `).join('');
-}
-
-/* ---------- Меню ---------- */
-async function openRestaurant(id){
-  const r = restaurants.find(x => String(x.id) === String(id)); if(!r) return;
-  currentRestaurant = r; cart.clear();
-  $('menuTitle').textContent = r.name;
-  $('menuDescription').textContent = (r.description || '') + ' • ' + (r.address || 'Душанбе');
-  toggle('menuSection', true); toggle('restaurantSection', false); toggle('checkoutSection', false);
-  $('menuItems').innerHTML = '<div class="empty">Меню бор шуда истодааст...</div>';
-  const { data, error } = await sb.from('menu_items').select('id,restaurant_id,name,description,price,image_url,is_available').eq('restaurant_id', id).eq('is_available', true).order('name');
-  if(error){ $('menuItems').innerHTML = '<div class="empty">Меню бор нашуд: ' + esc(error.message) + '</div>'; return; }
-  menuItems = data || [];
-  renderMenu();
-  updateCart();
-}
-function renderMenu(){
-  if(!menuItems.length){ $('menuItems').innerHTML = '<div class="empty">Ин ресторан ҳоло хӯроки дастрас надорад.</div>'; return; }
-  $('menuItems').innerHTML = menuItems.map(m => `
-    <article class="card">
-      ${m.image_url
-        ? `<img src="${esc(m.image_url)}" alt="${esc(m.name)}" style="width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:8px">`
-        : '<div style="font-size:30px">🥘</div>'}
-      <h3>${esc(m.name)}</h3>
-      <p class="muted">${esc(m.description || '')}</p>
-      <div class="row"><span class="price">${money(m.price)}</span><button data-add="${m.id}">+ Илова</button></div>
-    </article>
-  `).join('');
-}
-
-/* ---------- Сабад + 8% ---------- */
-function updateCart(){
-  const count = [...cart.values()].reduce((a,x) => a + x.quantity, 0);
-  const subtotal = [...cart.values()].reduce((a,x) => a + x.quantity * Number(x.item.price), 0);
-  const serviceFee = moneyNumber(subtotal * 0.08);
-  const deliveryFee = count > 0 ? 10 : 0;
-  const total = moneyNumber(subtotal + serviceFee + deliveryFee);
-  $('cartCount').textContent = `${count} хӯрок`;
-  $('cartTotal').textContent = 'Ҳамагӣ: ' + money(total);
-  toggle('cartBar', count > 0);
-  const breakdown = $('checkoutPriceBreakdown');
-  if(breakdown){
-    breakdown.innerHTML = count
-      ? `<div class="item"><span>Нархи аслии хӯрокҳо</span><strong>${money(subtotal)}</strong></div>
-         <div class="item"><span>Ҳаққи хизматрасонии FoodTJ (8%)</span><strong>${money(serviceFee)}</strong></div>
-         <div class="item"><span>Расонидан</span><strong>${money(deliveryFee)}</strong></div>
-         <div class="item"><strong>Ҳамагӣ</strong><strong>${money(total)}</strong></div>`
-      : '<p class="muted">Сабади хӯрок холӣ аст.</p>';
-  }
-}
-
-/* ---------- Фармоишҳои ман ---------- */
-async function loadMyOrders(){
-  if(!currentUser) return;
-  const { data, error } = await sb.from('orders').select('id,restaurant_id,status,subtotal,service_fee,delivery_fee,total,created_at,delivery_address').eq('customer_id', currentUser.id).order('created_at', {ascending:false}).limit(30);
-  if(error){ $('myOrders').innerHTML = '<div class="empty">Фармоишҳо бор нашуданд: ' + esc(error.message) + '</div>'; return; }
-  if(!data?.length){ $('myOrders').innerHTML = '<div class="empty">Шумо ҳоло фармоиш надоред.</div>'; return; }
-  $('myOrders').innerHTML = data.map(o => `
-    <article class="card order-card">
-      <div class="section-head"><strong>Фармоиш #${esc(String(o.id).slice(0,8))}</strong><span class="pill">${esc(statusNames[o.status] || o.status)}</span></div>
-      <p class="muted">${new Date(o.created_at).toLocaleString('tg-TJ')} • ${esc(o.delivery_address || '')}</p>
-      <p class="muted">Хӯрок: ${money(o.subtotal || 0)} + ҳаққи хизматрасонӣ: ${money(o.service_fee || 0)} + расонидан: ${money(o.delivery_fee || 0)}</p>
-      <strong>Ҳамагӣ: ${money(o.total)}</strong>
-    </article>
-  `).join('');
-}
-
-/* ---------- Курьер ---------- */
-async function loadCourierOrders(){
-  if(!profile || profile.role !== 'courier') return;
-  const { data:available, error } = await sb.rpc('foodtj_available_orders');
-  const { data:assigned, error:assignedError } = await sb.from('orders')
-    .select('id,restaurant_id,status,delivery_address,customer_phone,total,created_at')
-    .eq('courier_id', currentUser.id)
-    .in('status', ['ready_for_pickup','picked_up','delivering'])
-    .order('created_at', {ascending:true});
-  let htmlParts = [];
-  htmlParts.push('<h3>Фармоишҳои ба ман таъиншуда</h3>');
-  if(assignedError){
-    htmlParts.push('<div class="empty">Фармоишҳои таъиншуда бор нашуданд: ' + esc(assignedError.message) + '</div>');
-  } else if(!assigned?.length){
-    htmlParts.push('<div class="empty">Шумо ҳоло фармоиши фаъол надоред.</div>');
-  } else {
-    htmlParts.push(assigned.map(o => {
-      let next = '';
-      if(o.status === 'ready_for_pickup') next = '<option value="picked_up">Хӯрокро гирифтам</option>';
-      if(o.status === 'picked_up') next = '<option value="delivering">Дар роҳ ҳастам</option>';
-      if(o.status === 'delivering') next = '<option value="delivered">Расонида шуд</option>';
-      return `<article class="card order-card">
-        <div class="section-head"><strong>Фармоиш #${esc(String(o.id).slice(0,8))}</strong><span class="pill">${money(o.total)}</span></div>
-        <p>📍 ${esc(o.delivery_address || '')}</p>
-        <p class="muted">Телефон: ${esc(o.customer_phone || '')} • ${esc(statusNames[o.status] || o.status)}</p>
-        ${next ? `<div class="row"><select id="courier-st-${o.id}">${next}</select><button data-courier-status="${o.id}">Нав кардани ҳолат</button></div>` : ''}
-      </article>`;
-    }).join(''));
-  }
-  htmlParts.push('<h3 class="section">Фармоишҳои дастрас</h3>');
-  if(error){
-    htmlParts.push('<div class="empty">Фармоишҳои дастрас ҳоло бор нашуданд. ' + esc(error.message) + '</div>');
-  } else if(!available?.length){
-    htmlParts.push('<div class="empty">Ҳоло фармоиши нави дастрас нест.</div>');
-  } else {
-    htmlParts.push(available.map(o => `
-      <article class="card order-card">
-        <div class="section-head"><strong>Фармоиш #${esc(String(o.id).slice(0,8))}</strong><span class="pill">${money(o.total)}</span></div>
-        <p>📍 ${esc(o.delivery_address || '')}</p>
-        <p class="muted">Телефон: ${esc(o.customer_phone || '')} • ${esc(statusNames[o.status] || o.status)}</p>
-        <button data-claim="${o.id}">Қабул кардани фармоиш</button>
-      </article>
-    `).join(''));
-  }
-  $('courierOrders').innerHTML = htmlParts.join('');
-}
-
-/* ---------- Ресторан (соҳиб) ---------- */
-async function loadOwnerPanel(){
-  if(!currentUser) return;
-  const { data, error } = await sb.from('restaurants').select('*').eq('owner_id', currentUser.id).order('created_at', {ascending:false});
-  if(error){ $('ownerRestaurants').textContent = error.message; return; }
-  ownerRestaurants = data || [];
-  $('ownerRestaurants').innerHTML = ownerRestaurants.length
-    ? ownerRestaurants.map(r => `
-      <article class="item">
-        <div>
-          <strong>${esc(r.name)}</strong>
-          <div class="muted">${esc(r.address || '')}</div>
-          <span class="pill ${r.is_approved ? '' : 'gray'}">${r.is_approved ? 'Тасдиқ шудааст' : 'Интизорӣ барои тасдиқ'}</span>
-        </div>
-        <span class="muted">${r.is_open ? 'Кушода' : 'Баста'}</span>
-      </article>
-    `).join('')
-    : '<div class="empty">Ҳоло ресторан илова нашудааст.</div>';
-  $('ownerRestaurantSelect').innerHTML = '<option value="">Ресторанро интихоб кунед</option>' + ownerRestaurants.map(r => `<option value="${r.id}">${esc(r.name)}</option>`).join('');
-  const ids = ownerRestaurants.map(r => r.id);
-  if(!ids.length){ $('restaurantOrders').innerHTML = '<div class="empty">Аввал ресторан илова кунед.</div>'; return; }
-  const { data:orders, error:oe } = await sb.from('orders').select('*').in('restaurant_id', ids).order('created_at', {ascending:false}).limit(50);
-  if(oe){ $('restaurantOrders').textContent = oe.message; return; }
-  $('restaurantOrders').innerHTML = (orders || []).length
-    ? (orders || []).map(o => restaurantOrderHtml(o)).join('')
-    : '<div class="empty">Ҳоло фармоиш нест.</div>';
-}
-function restaurantOrderHtml(o){
-  let options = '';
-  if(o.status === 'new') options = '<option value="accepted">Қабул кардан</option><option value="cancelled">Бекор кардан</option>';
-  if(o.status === 'accepted') options = '<option value="preparing">Оғози тайёркунӣ</option>';
-  if(o.status === 'preparing') options = '<option value="ready_for_pickup">Омода барои курьер</option>';
-  return `<article class="card order-card">
-    <div class="section-head"><strong>#${esc(String(o.id).slice(0,8))}</strong><span class="pill">${esc(statusNames[o.status] || o.status)}</span></div>
-    <p class="muted">${esc(o.delivery_address || '')} • ${money(o.total)}</p>
-    ${options ? `<div class="row"><select id="st-${o.id}">${options}</select><button data-restaurant-status="${o.id}">Нав кардани ҳолат</button></div>` : ''}
-  </article>`;
-}
-
-/* ============================================================
-   ADMIN DASHBOARD
-   ============================================================ */
-
-let adminData = { users: [], restaurants: [], couriers: [], orders: [], topups: [] };
-
-function adminIsAllowed(){
-  return !!(currentUser && profile && profile.role === 'admin');
-}
-
-function adminCount(id, value){
-  const el = $(id);
-  if(el) el.textContent = value;
-}
-
-function adminError(message){
-  return `<div class="admin-error">${esc(message)}</div>`;
-}
-
-function adminEmpty(message){
-  return `<div class="empty">${esc(message)}</div>`;
-}
-
-function adminStatus(value){
   const labels = {
-    new:'Нав', accepted:'Қабул шуд', preparing:'Дар тайёркунӣ',
-    ready_for_pickup:'Интизорӣ барои курьер', picked_up:'Курьер гирифт',
-    delivering:'Дар роҳ', delivered:'Рассида шуд', cancelled:'Бекор шуд',
-    pending:'Дар интизорӣ', approved:'Тасдиқ шуд', rejected:'Рад шуд'
+    customer: 'муштарӣ',
+    courier: 'курьер',
+    restaurant: 'ресторан',
+    admin: 'администратор'
   };
-  return labels[value] || value || '—';
-}
 
-function adminDate(value){
-  if(!value) return '—';
-  const d = new Date(value);
-  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString('tg-TJ');
-}
+  setText('roleBadge', labels[role] || role);
 
-let foodtjOrdersTruncated = false;
-async function foodtjFetchAdminOrders(){
-  const pageSize=500, maxRows=10000, all=[];
-  foodtjOrdersTruncated=false;
-  for(let offset=0;offset<maxRows;offset+=pageSize){
-    const result=await sb.from('orders')
-      .select('id,status,total,subtotal,service_fee,delivery_fee,created_at,restaurant_id,customer_id,courier_id')
-      .order('created_at',{ascending:false}).order('id',{ascending:false})
-      .range(offset,offset+pageSize-1);
-    if(result.error) return {data:null,error:result.error};
-    const batch=result.data||[];
-    all.push(...batch);
-    if(batch.length<pageSize) return {data:all,error:null};
+  setText(
+    'accountDetails',
+    `Email: ${currentUser.email || '—'} | Нақш: ${labels[role] || role}`
+  );
+
+  if (role === 'admin') show('adminSection');
+  else hide('adminSection');
+
+  if (role === 'courier' || role === 'admin') {
+    show('courierSection');
+  } else {
+    hide('courierSection');
   }
-  foodtjOrdersTruncated=true;
-  return {data:all,error:null};
+
+  if (role === 'restaurant' || role === 'admin') {
+    show('restaurantOwnerSection');
+  } else {
+    hide('restaurantOwnerSection');
+  }
 }
 
-async function adminLoadData(){
-  if(!adminIsAllowed()){
-    showNotice('Дастрасӣ танҳо барои администратор иҷозат аст.','error');
+async function refreshAccount() {
+  const { data, error } = await sb.auth.getUser();
+
+  if (error && error.name !== 'AuthSessionMissingError') {
+    console.warn('Auth:', error.message);
+  }
+
+  currentUser = data?.user || null;
+  await loadProfile();
+  updateAccountUI();
+}
+
+/* ===== Барқароркунии парол ===== */
+function openPasswordRecovery(email = '') {
+  hide('authPanel');
+  show('passwordRecoveryPanel');
+
+  $('recoveryEmail').value =
+    email || currentUser?.email || '';
+
+  if (passwordRecoveryActive) {
+    hide('passwordResetRequest');
+    show('passwordResetNew');
+  } else {
+    show('passwordResetRequest');
+    hide('passwordResetNew');
+  }
+
+  $('passwordRecoveryPanel').scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+}
+
+async function sendRecoveryEmail() {
+  const email = $('recoveryEmail').value.trim();
+
+  if (!email) {
+    recoveryMessage('Email-ро ворид кунед.', true);
     return;
   }
 
-  $('adminRecentOrders').innerHTML = adminEmpty('Маълумот бор шуда истодааст...');
-  $('adminOrders').innerHTML = adminEmpty('Маълумот бор шуда истодааст...');
+  const button = $('sendRecoveryEmail');
+  button.disabled = true;
 
   try {
-    const results = await Promise.all([
-      sb.from('profiles').select('id,phone,full_name,role,is_available,created_at').order('created_at',{ascending:false}).limit(500),
-      sb.from('restaurants').select('id,name,phone,address,is_open,is_approved,created_at,owner_id').order('created_at',{ascending:false}).limit(500),
-      foodtjFetchAdminOrders(),
-      sb.from('foodtj_wallet_topup_requests').select('id,user_id,amount,method,status,created_at').order('created_at',{ascending:false}).limit(200)
-    ]);
+    const { error } =
+      await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: FOODTJ_URL
+      });
 
-    const [usersResult, restaurantsResult, ordersResult, topupsResult] = results;
+    if (error) throw error;
 
-    if(usersResult.error) throw new Error('Профилҳо: ' + usersResult.error.message);
-    if(restaurantsResult.error) throw new Error('Ресторанҳо: ' + restaurantsResult.error.message);
-    if(ordersResult.error) throw new Error('Фармоишҳо: ' + ordersResult.error.message);
-    if(topupsResult.error) console.warn('Admin wallet requests:', topupsResult.error.message);
-
-    adminData.users = usersResult.data || [];
-    adminData.restaurants = restaurantsResult.data || [];
-    adminData.orders = ordersResult.data || [];
-    adminData.topups = topupsResult.error ? [] : (topupsResult.data || []);
-    adminData.couriers = adminData.users.filter(u => u.role === 'courier');
-
-    adminRenderDashboard();
-    foodtjRenderAnalytics();
-    adminRenderUsers();
-    adminRenderRestaurants();
-    adminRenderCouriers();
-    adminRenderOrders();
-    adminRenderWallet();
-    if(topupsResult.error) $('adminWalletRequests').innerHTML = adminError('Дархостҳои ҳамён бор нашуданд: ' + topupsResult.error.message);
-    adminRenderCommission();
-
-  } catch(e) {
-    console.error('Admin dashboard:',e);
-    showNotice('Маълумоти панели администратор бор нашуд: ' + e.message,'error');
-    $('adminRecentOrders').innerHTML = adminError(e.message);
-  }
-}
-
-function adminRenderDashboard(){
-  const users = adminData.users;
-  const orders = adminData.orders;
-  const restaurants = adminData.restaurants;
-
-  adminCount('admOrdersCount',orders.length);
-  adminCount('admRestaurantsCount',restaurants.length);
-  adminCount('admCustomersCount',users.filter(u=>u.role==='customer').length);
-  adminCount('admCouriersCount',adminData.couriers.length);
-  adminCount('admTopupsCount',adminData.topups.filter(t=>t.status==='pending').length);
-
-  const sales = orders.reduce((sum,o)=>sum+Number(o.total||0),0);
-  adminCount('admSalesTotal',money(sales));
-
-  const recent = orders.slice(0,8);
-  $('adminRecentOrders').innerHTML = recent.length
-    ? recent.map(o=>`
-      <div class="item">
-        <div>
-          <strong>Фармоиш #${esc(String(o.id).slice(0,8))}</strong>
-          <div class="muted">${esc(adminStatus(o.status))} · ${adminDate(o.created_at)}</div>
-        </div>
-        <strong>${money(o.total)}</strong>
-      </div>
-    `).join('')
-    : adminEmpty('Фармоиш нест.');
-
-  const statuses = ['new','accepted','preparing','ready_for_pickup','picked_up','delivering','delivered','cancelled'];
-  const counts = statuses.map(status=>({ status, count:orders.filter(o=>o.status===status).length }));
-  const max = Math.max(1,...counts.map(x=>x.count));
-
-  $('adminOrderStats').innerHTML = counts.map(x=>`
-    <div class="admin-bar-row">
-      <span>${esc(adminStatus(x.status))}</span>
-      <div class="admin-bar-track"><div class="admin-bar-fill" style="width:${x.count/max*100}%"></div></div>
-      <strong>${x.count}</strong>
-    </div>
-  `).join('');
-}
-
-function adminRenderUsers(){
-  const q = ($('adminUserSearch')?.value||'').trim().toLowerCase();
-  const rows = adminData.users.filter(u=>`${u.full_name||''} ${u.phone||''} ${u.role||''}`.toLowerCase().includes(q));
-  $('adminUsersList').innerHTML = rows.length
-    ? `<div class="admin-table-wrap">
-        <table class="admin-table">
-          <thead><tr><th>Ном</th><th>Телефон</th><th>Нақш</th><th>Санаи сабт</th></tr></thead>
-          <tbody>${rows.map(u=>`<tr><td>${esc(u.full_name||'—')}</td><td>${esc(u.phone||'—')}</td><td>${esc(roleLabel(u.role))}</td><td>${adminDate(u.created_at)}</td></tr>`).join('')}</tbody>
-        </table>
-      </div>`
-    : adminEmpty('Истифодабаранда ёфт нашуд.');
-}
-
-function adminRenderRestaurants(){
-  const q = ($('adminRestaurantSearch')?.value||'').trim().toLowerCase();
-  const rows = adminData.restaurants.filter(r=>`${r.name||''} ${r.phone||''} ${r.address||''}`.toLowerCase().includes(q));
-  $('adminRestaurantsList').innerHTML = rows.length
-    ? `<div class="admin-table-wrap">
-        <table class="admin-table">
-          <thead><tr><th>Ресторан</th><th>Телефон</th><th>Суроға</th><th>Тасдиқ</th><th>Ҳолат</th></tr></thead>
-          <tbody>${rows.map(r=>`<tr><td><strong>${esc(r.name)}</strong></td><td>${esc(r.phone||'—')}</td><td>${esc(r.address||'—')}</td><td>${r.is_approved?'Тасдиқшуда':'Интизорӣ'}</td><td>${r.is_open?'Кушода':'Баста'}</td></tr>`).join('')}</tbody>
-        </table>
-      </div>`
-    : adminEmpty('Ресторан ёфт нашуд.');
-}
-
-function adminRenderCouriers(){
-  const q = ($('adminCourierSearch')?.value||'').trim().toLowerCase();
-  const rows = adminData.couriers.filter(u=>`${u.full_name||''} ${u.phone||''}`.toLowerCase().includes(q));
-  $('adminCouriersList').innerHTML = rows.length
-    ? `<div class="admin-table-wrap">
-        <table class="admin-table">
-          <thead><tr><th>Ном</th><th>Телефон</th><th>Дастрасӣ</th></tr></thead>
-          <tbody>${rows.map(u=>`<tr><td>${esc(u.full_name||'—')}</td><td>${esc(u.phone||'—')}</td><td><span class="admin-status">${u.is_available?'🟢 Онлайн':'⚪ Офлайн'}</span></td></tr>`).join('')}</tbody>
-        </table>
-      </div>`
-    : adminEmpty('Курьер ёфт нашуд.');
-}
-
-function adminRenderOrders(){
-  const rows = adminData.orders;
-  $('adminOrders').innerHTML = rows.length
-    ? `<div class="admin-table-wrap">
-        <table class="admin-table">
-          <thead><tr><th>Рақам</th><th>Ҳолат</th><th>Маблағ</th><th>Комиссия</th><th>Сана</th></tr></thead>
-          <tbody>${rows.map(o=>`<tr><td>#${esc(String(o.id).slice(0,8))}</td><td>${esc(adminStatus(o.status))}</td><td><strong>${money(o.total)}</strong></td><td>${money(o.service_fee)}</td><td>${adminDate(o.created_at)}</td></tr>`).join('')}</tbody>
-        </table>
-      </div>`
-    : adminEmpty('Фармоиш нест.');
-}
-
-function adminRenderWallet(){
-  const rows = adminData.topups;
-  $('adminWalletRequests').innerHTML = rows.length
-    ? `<div class="admin-table-wrap">
-        <table class="admin-table">
-          <thead><tr><th>Маблағ</th><th>Усул</th><th>Ҳолат</th><th>Сана</th></tr></thead>
-          <tbody>${rows.map(r=>`<tr><td><strong>${money(r.amount)}</strong></td><td>${esc(walletMethodLabel(r.method))}</td><td>${esc(adminStatus(r.status))}</td><td>${adminDate(r.created_at)}</td></tr>`).join('')}</tbody>
-        </table>
-      </div>`
-    : adminEmpty('Дархости пуркунӣ нест.');
-}
-
-function adminRenderCommission(){
-  const total = adminData.orders.reduce((sum,o)=>sum+Number(o.service_fee||0),0);
-  adminCount('admCommissionTotal',money(total));
-}
-
-function adminShowTab(tab){
-  if(!adminIsAllowed()) return;
-  document.querySelectorAll('[data-admin-tab]').forEach(button=>{
-    button.classList.toggle('active',button.dataset.adminTab===tab);
-  });
-  document.querySelectorAll('.admin-panel').forEach(panel=>{
-    panel.classList.toggle('active',panel.id==='adminPanel-'+tab);
-  });
-}
-
-/* Analytics */
-function foodtjDayKey(date){
-  const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Dushanbe',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(date);
-  const part=(type)=>parts.find(p=>p.type===type)?.value;
-  return `${part('year')}-${part('month')}-${part('day')}`;
-}
-function foodtjRenderBars(id, values, days, isProfit){
-  const root=$(id); if(!root) return;
-  const max=Math.max(1,...values);
-  root.innerHTML='<div class="foodtj-bars">'+values.map((v,i)=>{
-    const h=v===0?2:Math.max(5,Math.round(v/max*145));
-    return `<div class="foodtj-bar-slot" title="${esc(days[i])}: ${esc(isProfit?money(v):v)}"><span class="foodtj-bar-value">${esc(isProfit?Number(v).toFixed(1):v)}</span><div class="foodtj-bar ${isProfit?'profit':''}" style="height:${h}px"></div></div>`;
-  }).join('')+'</div><div class="foodtj-axis">'+days.map(d=>`<span>${esc(d.slice(5))}</span>`).join('')+'</div>';
-}
-function foodtjRenderAnalytics(){
-  if(!adminIsAllowed()) return;
-  const orders=adminData.orders||[];
-  const now=new Date();
-  const today=foodtjDayKey(now);
-  const days=[];
-  for(let i=6;i>=0;i--){
-    const utc=new Date(Date.UTC(Number(today.slice(0,4)),Number(today.slice(5,7))-1,Number(today.slice(8,10))-i,12));
-    days.push(foodtjDayKey(utc));
-  }
-  const counts=days.map(()=>0), fees=days.map(()=>0);
-  let todayOrders=0,todayDelivered=0,todaySales=0,todayFee=0;
-  for(const o of orders){
-    if(!o.created_at)continue;
-    const date=new Date(o.created_at);
-    if(Number.isNaN(date.getTime()))continue;
-    const key=foodtjDayKey(date);
-    const idx=days.indexOf(key);
-    if(idx>=0)counts[idx]++;
-    if(key===today)todayOrders++;
-    if(o.status==='delivered'){
-      const fee=Number(o.service_fee)||0;
-      if(idx>=0)fees[idx]+=fee;
-      if(key===today){todayDelivered++;todaySales+=Number(o.total)||0;todayFee+=fee;}
-    }
-  }
-  const bonus=todayFee*0.02;
-  const set=(id,value)=>{if($(id))$(id).textContent=value;};
-  set('ftTodayOrders',todayOrders);
-  set('ftTodayDelivered',todayDelivered);
-  set('ftTodaySales',money(todaySales));
-  set('ftTodayCommission',money(todayFee));
-  set('ftTodayBonus',money(bonus));
-  set('ftTodayNet',money(todayFee-bonus));
-  foodtjRenderBars('ftOrdersChart',counts,days,false);
-  foodtjRenderBars('ftProfitChart',fees,days,true);
-  set('ftAnalyticsNote', 'Ҳисоб аз рӯйи санаи сохтани фармоиш (created_at). Комиссия танҳо барои фармоишҳои «Расонида шуд». Баъди бонус фоидаи холис нест. '+(foodtjOrdersTruncated?'⚠ Танҳо 10 000 фармоиши охирин бор шуд.':'Натиҷа аз фармоишҳои ба администратор тавассути RLS намоён ҳисоб шудааст.'));
-}
-
-async function loadAdminOrders(){
-  await adminLoadData();
-}
-
-/* ---------- Вуруд / Сабти ном ---------- */
-async function signInOrUp(){
-  clearNotice();
-  const email = $('authEmail').value.trim(), password = $('authPassword').value;
-  if(!email || !password){ showNotice('Email ва паролро пур кунед.', 'error'); return; }
-  const btn = $('authSubmit'); setBusy(btn, true);
-  try {
-    if(authMode === 'signup'){
-      const { data, error } = await sb.auth.signUp({ email, password, options: { data: { full_name: ($('authName').value || '').trim(), phone: ($('authPhone').value || '').trim() } } });
-      if(error) throw error;
-      if(data.session){
-        await loadProfile(data.user);
-        toggle('authPanel', false);
-        showNotice('Сабти ном бомуваффақият анҷом ёфт.', 'success');
-      } else {
-        showNotice('Сабти ном қабул шуд. Агар тасдиқи email фаъол бошад, почтаи худро тасдиқ карда баъд ворид шавед.', 'success');
-      }
-    } else {
-      const { data, error } = await sb.auth.signInWithPassword({ email, password });
-      if(error) throw error;
-      await loadProfile(data.user);
-      toggle('authPanel', false);
-      showNotice('Шумо ворид шудед.', 'success');
-    }
-  } catch(e){
-    showNotice(e.message || 'Хато рух дод.', 'error');
+    recoveryMessage(
+      'Агар ин email аккаунт дошта бошад, пайванди барқароркунӣ фиристода мешавад.'
+    );
+  } catch (error) {
+    recoveryMessage(error.message, true);
   } finally {
-    setBusy(btn, false);
+    button.disabled = false;
   }
 }
 
-/* ---------- Сохтани фармоиш ---------- */
-async function createOrder(){
-  if(!requireLogin()) return;
-  if(profile?.role !== 'customer'){ showNotice('Фармоиш додан танҳо аз ҳисоби муштарӣ мумкин аст.', 'error'); return; }
-  const address = $('deliveryAddress').value.trim(), phone = $('deliveryPhone').value.trim();
-  if(!address || !phone){ showNotice('Суроға ва рақами телефонро пур кунед.', 'error'); return; }
-  if(!cart.size || !currentRestaurant){ showNotice('Сабади хӯрок холӣ аст.', 'error'); return; }
-  const items = [...cart.values()].map(x => ({ menu_item_id: x.item.id, quantity: x.quantity }));
-  const btn = $('placeOrder'); setBusy(btn, true);
+async function saveRecoveryPassword() {
+  if (!passwordRecoveryActive) {
+    recoveryMessage(
+      'Аввал пайванди барқароркуниро аз email кушоед.',
+      true
+    );
+    return;
+  }
+
+  const password = $('recoveryNewPassword').value;
+  const confirm = $('recoveryConfirmPassword').value;
+
+  if (password.length < 8) {
+    recoveryMessage(
+      'Парол бояд ҳадди ақал 8 аломат дошта бошад.',
+      true
+    );
+    return;
+  }
+
+  if (password !== confirm) {
+    recoveryMessage('Паролҳо якхела нестанд.', true);
+    return;
+  }
+
+  const button = $('saveRecoveryPassword');
+  button.disabled = true;
+
   try {
-    const { data, error } = await sb.rpc('foodtj_create_order', {
-      p_restaurant_id: currentRestaurant.id,
-      p_delivery_address: address,
-      p_customer_phone: phone,
-      p_delivery_latitude: null,
-      p_delivery_longitude: null,
-      p_payment_method: $('paymentMethod').value,
-      p_notes: $('orderNotes').value.trim(),
-      p_items: items
+    const { error } = await sb.auth.updateUser({
+      password
     });
-    if(error) throw error;
-    cart.clear(); updateCart();
-    toggle('checkoutSection', false); toggle('menuSection', false); toggle('restaurantSection', true);
-    showNotice('Фармоиш фиристода шуд! Рақами фармоиш: ' + String(data?.id || '').slice(0,8) + '.', 'success');
-    await loadMyOrders();
-    toggle('myOrdersSection', true);
-  } catch(e){
-    showNotice('Фармоиш ҳоло сохта нашуд: ' + (e.message || e), 'error');
+
+    if (error) throw error;
+
+    recoveryMessage(
+      'Парол бомуваффақият иваз шуд. Акнун бо пароли нав ворид шавед.'
+    );
+
+    passwordRecoveryActive = false;
+    $('recoveryNewPassword').value = '';
+    $('recoveryConfirmPassword').value = '';
+
+    await sb.auth.signOut();
+    await refreshAccount();
+
+    hide('passwordResetNew');
+    show('passwordResetRequest');
+  } catch (error) {
+    recoveryMessage(error.message, true);
   } finally {
-    setBusy(btn, false);
+    button.disabled = false;
   }
 }
 
-/* ---------- Event listeners ---------- */
-$('loginTop').onclick = () => { authMode='login'; $('authTitle').textContent='Вуруд ба FoodTJ'; $('authSubmit').textContent='Вуруд'; $('authName').classList.add('hidden'); toggle('authPanel',true); $('authPanel').scrollIntoView({behavior:'smooth'}); };
-$('closeAuth').onclick = () => toggle('authPanel', false);
-$('toggleSignup').onclick = () => {
-  authMode = authMode === 'login' ? 'signup' : 'login';
-  const up = authMode === 'signup';
-  $('authTitle').textContent = up ? 'Сабти номи нав' : 'Вуруд ба FoodTJ';
-  $('authSubmit').textContent = up ? 'Сабти ном' : 'Вуруд';
-  $('toggleSignup').textContent = up ? 'Ман ҳисоб дорам' : 'Сабти номи нав';
-  $('authName').classList.toggle('hidden', !up);
-  $('authPassword').autocomplete = up ? 'new-password' : 'current-password';
-};
-$('authSubmit').onclick = signInOrUp;
-$('logoutTop').onclick = async () => { if(sb) await sb.auth.signOut(); resetSession(); showNotice('Шумо аз ҳисоб баромадед.', 'success'); };
-$('accountTop').onclick = () => { toggle('accountPanel', true); $('accountPanel').scrollIntoView({behavior:'smooth'}); };
-$('walletRefresh').onclick = loadWallet;
-$('walletTopupRequest').onclick = requestWalletTopup;
-
-document.querySelectorAll('.foodtj-nav a').forEach(link => {
-  link.addEventListener('click', (e) => {
-    const href = link.getAttribute('href') || '';
-    if (!href.startsWith('#')) return;
-    const targetId = href.slice(1);
-    const target = document.getElementById(targetId);
-    if (!target) return;
-
-    const role = profile?.role || null;
-    if (targetId === 'myOrdersSection' && (!currentUser || !['customer', 'admin'].includes(role))) {
-      e.preventDefault();
-      showNotice('Барои дидани фармоишҳо аввал ворид шавед.', 'error');
-      if (!currentUser) { toggle('authPanel', true); $('authPanel')?.scrollIntoView({behavior:'smooth', block:'start'}); }
-      return;
-    }
-    if (targetId === 'adminSection' && role !== 'admin') {
-      e.preventDefault();
-      showNotice('Ин бахш танҳо барои администратор аст.', 'error');
-      return;
-    }
-    if (targetId === 'courierSection' && role !== 'courier') {
-      e.preventDefault();
-      showNotice('Ин бахш танҳо барои курьер аст.', 'error');
-      return;
-    }
-    if (targetId === 'restaurantOwnerSection' && role !== 'restaurant') {
-      e.preventDefault();
-      showNotice('Ин бахш танҳо барои ресторан аст.', 'error');
-      return;
-    }
-    if (targetId === 'walletSection' && !currentUser) {
-      e.preventDefault();
-      toggle('authPanel', true);
-      $('authPanel')?.scrollIntoView({behavior:'smooth', block:'start'});
-      showNotice('Барои истифодаи ҳамён аввал ворид шавед.', 'error');
-      return;
-    }
-    if (targetId === 'accountPanel' && !currentUser) {
-      e.preventDefault();
-      toggle('authPanel', true);
-      $('authPanel')?.scrollIntoView({behavior:'smooth', block:'start'});
-      showNotice('Барои кушодани ҳисоб аввал ворид шавед.', 'error');
-      return;
-    }
-
-    document.querySelectorAll('.foodtj-nav a').forEach(a => a.classList.remove('active'));
-    link.classList.add('active');
-    if (target.classList.contains('hidden')) target.classList.remove('hidden');
-    target.scrollIntoView({behavior:'smooth', block:'start'});
-  });
-});
-
-$('adminTabs')?.addEventListener('click',e=>{
-  const button=e.target.closest('[data-admin-tab]');
-  if(!button) return;
-  adminShowTab(button.dataset.adminTab);
-});
-
-document.querySelectorAll('#adminSection [data-admin-tab]').forEach(button=>{
-  button.addEventListener('click',()=>{
-    adminShowTab(button.dataset.adminTab);
-  });
-});
-
-$('adminUserSearch')?.addEventListener('input',adminRenderUsers);
-$('adminRestaurantSearch')?.addEventListener('input',adminRenderRestaurants);
-$('adminCourierSearch')?.addEventListener('input',adminRenderCouriers);
-
-$('reloadAdmin').onclick = loadAdminOrders;
-
-$('searchRestaurants').oninput = renderRestaurants;
-$('reloadRestaurants').onclick = loadRestaurants;
-$('publicCatalogSearch').addEventListener('input', renderPublicCatalog);
-$('restaurants').onclick = e => { const b = e.target.closest('[data-open-restaurant]'); if(b) openRestaurant(b.dataset.openRestaurant); };
-$('menuItems').onclick = e => {
-  const b = e.target.closest('[data-add]'); if(!b) return;
-  const item = menuItems.find(m => String(m.id) === String(b.dataset.add)); if(!item) return;
-  const row = cart.get(item.id) || { item, quantity: 0 };
-  row.quantity++;
-  cart.set(item.id, row);
-  updateCart();
-};
-$('backRestaurants').onclick = () => { toggle('menuSection', false); toggle('restaurantSection', true); };
-$('checkoutBtn').onclick = () => { if(!requireLogin()) return; toggle('checkoutSection', true); $('checkoutSection').scrollIntoView({behavior:'smooth'}); };
-$('cancelCheckout').onclick = () => toggle('checkoutSection', false);
-$('placeOrder').onclick = createOrder;
-
-$('availabilityBtn').onclick = async () => {
-  if(!profile || profile.role !== 'courier') return;
-  const next = !profile.is_available;
-  const { error } = await sb.from('profiles').update({ is_available: next }).eq('id', currentUser.id);
-  if(error){ showNotice('Тағйири дастрасӣ ноком шуд: ' + error.message, 'error'); return; }
-  profile.is_available = next;
-  $('availabilityText').textContent = next ? 'Дастрас ҳастед' : 'Ҳоло дастрас нестед';
-  $('availabilityBtn').textContent = next ? 'Хомӯш кардани дастрасӣ' : 'Фаъол кардани дастрасӣ';
-  await loadCourierOrders();
-  showNotice(next ? 'Дастрасии курьер фаъол шуд.' : 'Дастрасии курьер хомӯш шуд.', 'success');
-};
-$('reloadCourier').onclick = loadCourierOrders;
-$('courierOrders').onclick = async e => {
-  const statusButton = e.target.closest('[data-courier-status]');
-  if(statusButton){
-    const id = statusButton.dataset.courierStatus;
-    const newStatus = $('courier-st-' + id)?.value;
-    if(!newStatus) return;
-    statusButton.disabled = true;
-    const { error } = await sb.rpc('foodtj_courier_update_order_status', { p_order_id: id, p_new_status: newStatus });
-    if(error){ showNotice('Ҳолати расонидан тағйир наёфт: ' + error.message, 'error'); statusButton.disabled = false; return; }
-    showNotice('Ҳолати расонидан нав шуд.', 'success');
-    await loadCourierOrders();
+/* ===== Нест кардани аккаунт ===== */
+function requestAccountDeletion() {
+  if (!currentUser) {
+    notify('Аввал ба аккаунти худ ворид шавед.', true);
     return;
   }
-  const b = e.target.closest('[data-claim]'); if(!b) return;
-  if(!confirm('Ин фармоишро қабул мекунед?')) return;
-  b.disabled = true;
-  const { data, error } = await sb.rpc('foodtj_claim_order', { p_order_id: b.dataset.claim });
-  if(error){ showNotice(error.message, 'error'); b.disabled = false; return; }
-  showNotice('Фармоиш ба шумо таъин шуд.', 'success');
-  await loadCourierOrders();
-};
-$('createRestaurant').onclick = async () => {
-  if(!requireLogin()) return;
-  const name = $('newRestName').value.trim(); if(!name){ showNotice('Номи ресторанро пур кунед.', 'error'); return; }
-  const { error } = await sb.from('restaurants').insert({
-    owner_id: currentUser.id, name,
-    phone: $('newRestPhone').value.trim(),
-    address: $('newRestAddress').value.trim(),
-    description: $('newRestDescription').value.trim(),
-    is_approved: false, is_open: false
+
+  const confirmed = window.confirm(
+    'Шумо мехоҳед аккаунти FoodTJ-ро нест кунед?'
+  );
+
+  if (!confirmed) return;
+
+  notify(
+    'Несткунии аккаунт ҳоло фаъол нест. Барои иҷрои бехатари он бояд Supabase Edge Function ва санҷиши фармоишҳо пайваст карда шаванд.',
+    true
+  );
+}
+
+/* ===== Панели администратор ===== */
+function selectAdminTab(name) {
+  document.querySelectorAll(
+    '#adminTabs [data-admin-tab]'
+  ).forEach(button => {
+    button.classList.toggle(
+      'active',
+      button.dataset.adminTab === name
+    );
   });
-  if(error){ showNotice('Ресторан илова нашуд: ' + error.message, 'error'); return; }
-  ['newRestName','newRestPhone','newRestAddress','newRestDescription'].forEach(id => $(id).value = '');
-  showNotice('Ресторан фиристода шуд. Барои намоён шудан тасдиқи администратор лозим аст.', 'success');
-  await loadOwnerPanel();
-};
-$('createMenuItem').onclick = async () => {
-  const restaurantId = $('ownerRestaurantSelect').value;
-  const name = $('newItemName').value.trim();
-  const price = Number($('newItemPrice').value);
-  if(!restaurantId || !name || !Number.isFinite(price) || price < 0){
-    showNotice('Ресторан, номи хӯрок ва нархи дурустро пур кунед.', 'error'); return;
+
+  const panelNames = {
+    overview: 'adminPanelOverview',
+    orders: 'adminPanelOrders',
+    restaurants: 'adminPanelRestaurants',
+    couriers: 'adminPanelCouriers',
+    users: 'adminPanelUsers',
+    finance: 'adminPanelFinance',
+    settings: 'adminPanelSettings'
+  };
+
+  Object.values(panelNames).forEach(hide);
+
+  if (panelNames[name]) {
+    show(panelNames[name]);
+    $(panelNames[name]).classList.add('active');
   }
-  const { error } = await sb.from('menu_items').insert({
-    restaurant_id: restaurantId, name, price,
-    description: $('newItemDescription').value.trim(),
-    is_available: true
+
+  document.querySelectorAll('.admin-panel').forEach(
+    panel => {
+      panel.classList.toggle(
+        'active',
+        panel.id === panelNames[name]
+      );
+    }
+  );
+}
+
+/* ===== Пайваст кардани тугмаҳо ===== */
+function bindButton(id, callback) {
+  const button = $(id);
+  if (button) button.addEventListener('click', callback);
+}
+
+function initializeButtons() {
+  bindButton('loginTop', () => openAuth('login'));
+
+  bindButton('closeAuth', () => hide('authPanel'));
+
+  bindButton('toggleSignup', () => {
+    openAuth(authMode === 'login' ? 'signup' : 'login');
   });
-  if(error){ showNotice('Хӯрок илова нашуд: ' + error.message, 'error'); return; }
-  ['newItemName','newItemPrice','newItemDescription'].forEach(id => $(id).value = '');
-  showNotice('Хӯрок илова шуд.', 'success');
-};
-$('restaurantOrders').onclick = async e => {
-  const b = e.target.closest('[data-restaurant-status]'); if(!b) return;
-  const id = b.dataset.restaurantStatus, newStatus = $('st-' + id)?.value;
-  if(!newStatus) return;
-  const { error } = await sb.rpc('foodtj_restaurant_update_order_status', { p_order_id: id, p_new_status: newStatus });
-  if(error){ showNotice('Ҳолати фармоиш иваз нашуд: ' + error.message, 'error'); return; }
-  showNotice('Ҳолати фармоиш нав шуд.', 'success');
-  await loadOwnerPanel();
-};
 
-$('foodCatalogSearch').addEventListener('input', renderFoodCatalog);
-$('foodCatalogCategory').addEventListener('change', renderFoodCatalog);
-$('reloadFoodCatalog').addEventListener('click', loadFoodCatalog);
+  bindButton('authSubmit', submitAuth);
 
-init().catch(e => {
-  console.error(e);
-  const c = document.getElementById('restaurants');
-  if(c) c.innerHTML = '<div class="empty">Хатои инициализатсия: ' + String(e.message || e) + '</div>';
-});
+  bindButton('accountTop', () => {
+    $('accountPanel')?.scrollIntoView({
+      behavior: 'smooth'
+    });
+  });
+
+  bindButton('logoutTop', async () => {
+    const { error } = await sb.auth.signOut();
+
+    if (error) {
+      notify(error.message, true);
+      return;
+    }
+
+    await refreshAccount();
+    notify('Шумо аз аккаунт баромадед.');
+  });
+
+  bindButton('forgotPasswordBtn', () => {
+    openPasswordRecovery($('authEmail')?.value || '');
+  });
+
+  bindButton('accountChangePassword', () => {
+    openPasswordRecovery(currentUser?.email || '');
+  });
+
+  bindButton('closePasswordRecovery', () => {
+    hide('passwordRecoveryPanel');
+  });
+
+  bindButton('sendRecoveryEmail', sendRecoveryEmail);
+
+  bindButton('saveRecoveryPassword', saveRecoveryPassword);
+
+  bindButton('deleteMyAccount', requestAccountDeletion);
+
+  document.querySelectorAll(
+    '#adminTabs [data-admin-tab]'
+  ).forEach(button => {
+    button.addEventListener('click', () => {
+      selectAdminTab(button.dataset.adminTab);
+    });
+  });
+}
+
+/* ===== Оғози барнома ===== */
+async function initializeFoodTJ() {
+  initializeButtons();
+
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+      passwordRecoveryActive = true;
+      openPasswordRecovery();
+      recoveryMessage('Пароли нави худро ворид кунед.');
+    }
+
+    // Барои пешгирӣ аз deadlock:
+    // дар callback-и auth мустақим await намекунем.
+    if (
+      event === 'SIGNED_IN' ||
+      event === 'SIGNED_OUT' ||
+      event === 'USER_UPDATED'
+    ) {
+      setTimeout(() => {
+        refreshAccount().catch(console.error);
+      }, 0);
+    }
+  });
+
+  try {
+    await refreshAccount();
+    setText(
+      'foodtjConnectionStatus',
+      'Supabase пайваст шуд.'
+    );
+  } catch (error) {
+    setText(
+      'foodtjConnectionStatus',
+      'Хатои пайвастшавӣ: ' + error.message
+    );
+  }
+
+  selectAdminTab('overview');
+}
+
+document.addEventListener(
+  'DOMContentLoaded',
+  initializeFoodTJ
+);
 </script>
+
 </body>
 </html>
